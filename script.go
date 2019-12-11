@@ -180,13 +180,19 @@ func (poc ParsedOpCode) IsPubKey() bool {
 // IsCompressedPubKey checks a two byte slices if they could represent a
 // compressed public key. <pubkey length> <|pubkey|>
 func (poc ParsedOpCode) IsCompressedPubKey() bool {
-	return poc.OpCode == OpDATA33 && (poc.PushedData[0] == 0x02 || poc.PushedData[0] == 0x03)
+	if poc.OpCode == OpDATA33 && len(poc.PushedData) == 33 {
+		return (poc.PushedData[0] == 0x02 || poc.PushedData[0] == 0x03)
+	}
+	return false
 }
 
 // IsUncompressedPubKey checks a two byte slices if they could represent a
 // uncompressed public key. <pubkey length> <|pubkey|>
 func (poc ParsedOpCode) IsUncompressedPubKey() bool {
-	return poc.OpCode == OpDATA65 && poc.PushedData[0] == 0x04
+	if poc.OpCode == OpDATA65 && len(poc.PushedData) == 65 {
+		return poc.PushedData[0] == 0x04
+	}
+	return false
 }
 
 // IsMultisigScript checks if a passed BitcoinScript is multisig.
