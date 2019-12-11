@@ -99,20 +99,20 @@ func (s BitcoinScript) getDataPushLength() (dataPushLength int, encodingLength i
 
 		} else if opCode == OpPUSHDATA1 {
 			if len(s) >= 2 {
-				dataPushLength = int(s[1])
-				encodingLength = 1 + 1 // 1 byte OpCode + 1 byte to encode the data push length
+				dataPushLength = int(s[1]) // takes one byte
+				encodingLength = 1 + 1     // 1 byte OpCode + 1 byte to encode the data push length
 				return
 			}
 		} else if opCode == OpPUSHDATA2 {
 			if len(s) >= 3 {
-				dataPushLength = int(binary.LittleEndian.Uint16(s[1:4]))
-				encodingLength = 1 + 2 // 1 byte OpCode + 2 byte to encode the data push length
+				dataPushLength = int(binary.LittleEndian.Uint16(s[1:3])) // takes 2 bytes
+				encodingLength = 1 + 2                                   // 1 byte OpCode + 2 byte to encode the data push length
 				return
 			}
 		} else if opCode == OpPUSHDATA4 {
 			if len(s) >= 5 {
-				dataPushLength = int(binary.LittleEndian.Uint16(s[1:6]))
-				encodingLength = 1 + 4 // 1 byte OpCode + 4 byte to encode the data push length
+				dataPushLength = int(binary.LittleEndian.Uint16(s[1:5])) // takes 4 bytes
+				encodingLength = 1 + 4                                   // 1 byte OpCode + 4 byte to encode the data push length
 				return
 			}
 		}
