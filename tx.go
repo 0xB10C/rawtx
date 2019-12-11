@@ -3,7 +3,7 @@
 package rawtx
 
 import (
-	"bytes"
+	"log"
 	"math"
 
 	"github.com/btcsuite/btcd/wire"
@@ -122,14 +122,14 @@ func (tx *Tx) IsSpendingMultisig() bool {
 	return false
 }
 
-// IsCoinbase returns a boolean indicating if a transaction is a coinbase transaction
+// IsCoinbase returns a boolean indicating if a the transaction is a coinbase
+// transaction.
 func (tx *Tx) IsCoinbase() bool {
-	in0 := tx.Inputs[0]
-	if in0.Outpoint.OutputIndex == uint32(0xffffffff) &&
-		bytes.Equal(in0.Outpoint.PrevTxHash[:], []byte{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}) {
-		return true
+	if len(tx.Inputs) == 0 {
+		log.Printf("Transaction %s has no input.", tx.Hash)
+		return false
 	}
-	return false
+	return tx.Inputs[0].IsCoinbase()
 }
 
 // IsExplicitlyRBFSignaling returns a boolean indicating if the transaction is explicitly signaling ReplaceByFee
