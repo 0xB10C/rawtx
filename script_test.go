@@ -4,32 +4,10 @@ import (
 	"testing"
 )
 
-func TestParsePanic(t *testing.T) {
-	defer func() {
-		if r := recover(); r == nil {
-			t.Errorf("The code did not panic")
-		}
-	}()
-
-	var random BitcoinScript = []byte{byte(OpPUSHDATA1), 0x09, 0x23, 0x12, 0x99, 0x94, 0xab} // PUSHDATA1 with junk
-	random.ParseWithPanic()
-}
-
-func TestParsePanic2(t *testing.T) {
-	defer func() {
-		if r := recover(); r == nil {
-			t.Errorf("The code did not panic")
-		}
-	}()
-
-	var random BitcoinScript = []byte{byte(OpPUSHDATA1)} // only a PUSHDATA1
-	random.ParseWithPanic()
-}
-
-func TestParseEmtpy(t *testing.T) {
+func TestParseEmpty(t *testing.T) {
 	var empty BitcoinScript = []byte{}
 
-	if len(empty.ParseWithPanic()) != 0 {
+	if len(empty.Parse()) != 0 {
 		t.Errorf("The empty BitcoinScript should have a empty ParsedBitcoinScript.")
 	}
 
@@ -57,37 +35,33 @@ func TestReadPushLength(t *testing.T) {
 	scriptm[pushdata4push10byte] = [2]int{10, 5}
 	scriptm[pushdata4push75byte] = [2]int{75, 5}
 
-	for script, expexted := range scriptm {
-		resultLength, resultOffset, err := readPushLength(script[:])
-		if err != nil {
-			t.Errorf("readPushLength: %s", err)
-		}
-		if resultLength != expexted[0] || resultOffset != expexted[1] {
-			t.Errorf("Expexted readPushLength==%d, offset %d, but got %d, %d", expexted[0], expexted[1], resultLength, resultOffset)
+	for script, expected := range scriptm {
+		dataPushLength, encodingLength := BitcoinScript(script[:]).getDataPushLength()
+		if dataPushLength != expected[0] || encodingLength != expected[1] {
+			t.Errorf("Expected getDataPushLength==%d, offset %d, but got %d, %d", expected[0], expected[1], dataPushLength, encodingLength)
 			t.Errorf("tx: %v", script)
 		}
 	}
 
 	// test zero script length case
-	resultLength, resultOffset, err := readPushLength([]byte{})
-	if err == nil {
-		t.Errorf("readPushLength should have thrown an error. There is no data push.")
-	}
-	if resultLength != 0 || resultOffset != 0 {
-		t.Errorf("Expexted readPushLength==%d, offset %d, but got %d, %d", 0, 0, resultLength, resultOffset)
+	dataPushLength, encodingLength := BitcoinScript([]byte{}).getDataPushLength()
+	if dataPushLength != 0 || encodingLength != 0 {
+		t.Errorf("Expected getDataPushLength==%d, offset %d, but got %d, %d", 0, 0, dataPushLength, encodingLength)
 	}
 
-	// test invalid length PUSHDATAX
+}
+
+func TestGetDataPushLengthPanic(t *testing.T) {
+	// test invalid length for PUSHDATA_1, _2 and _4
 	failPushData1 := [1]byte{76}
 	failPushData2 := [1]byte{77}
 	failPushData4 := [1]byte{78}
-
 	failPushDataArr := [][1]byte{failPushData1, failPushData2, failPushData4}
 
 	for _, fail := range failPushDataArr {
-		resultLength, resultOffset, err := readPushLength(fail[:])
-		if err == nil || resultLength != 0 || resultOffset != 0 {
-			t.Errorf("readPushLength should have thrown an error. There is no data push.")
+		dataPushLength, encodingLength := BitcoinScript(fail[:]).getDataPushLength()
+		if dataPushLength != 0 && encodingLength != 1 {
+			t.Errorf("getDataPushLength should have returned a dataPushLength of 0 (did return %d) and a encodingLenght of 1 (did return %d)", dataPushLength, encodingLength)
 		}
 	}
 }
@@ -136,7 +110,7 @@ func TestIsMultisigScript(t *testing.T) {
 			result, m, n := redeemScript.IsMultisigScript()
 			if result != expected[index] {
 				t.Errorf("expected IsMultisigScript={%t, %d, %d}, got %t", expected[index], m, n, result)
-				t.Errorf("redeemScript %s", redeemScript.ParseWithPanic())
+				t.Errorf("redeemScript %s", redeemScript.Parse())
 			}
 		}
 	}
@@ -144,13 +118,13 @@ func TestIsMultisigScript(t *testing.T) {
 	redeemScript := BitcoinScript([]byte{byte(Op1), byte(Op0), byte(Op0), byte(Op0), byte(Op3), byte(OpCHECKMULTISIG)})
 	result, m, n := redeemScript.IsMultisigScript()
 	if result != false || m != 0 || n != 0 {
-		t.Errorf("expected %s not to be a valid Multisig script", redeemScript.ParseWithPanic())
+		t.Errorf("expected %s not to be a valid Multisig script", redeemScript.Parse())
 	}
 
 	redeemScript = BitcoinScript([]byte{byte(Op1), byte(OpCHECKMULTISIG)})
 	result, m, n = redeemScript.IsMultisigScript()
 	if result != false || m != 0 || n != 0 {
-		t.Errorf("expected %s not to be a valid Multisig script", redeemScript.ParseWithPanic())
+		t.Errorf("expected %s not to be a valid Multisig script", redeemScript.Parse())
 	}
 }
 
@@ -168,7 +142,7 @@ func TestGetSigHash(t *testing.T) {
 		}
 
 		for _, in := range tx.Inputs {
-			for _, p := range in.ScriptSig.ParseWithPanic() {
+			for _, p := range in.ScriptSig.Parse() {
 				if p.GetSigHash() != 0x1 {
 					if p.IsSignature() {
 						t.Errorf("Expected GetSigHash=%#x, but got %#x", 0x1, p.GetSigHash())
