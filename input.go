@@ -1,6 +1,7 @@
 package rawtx
 
 import (
+	"bytes"
 	"github.com/btcsuite/btcd/wire"
 )
 
@@ -73,7 +74,12 @@ func (in *Input) FromWireTxIn(txIn *wire.TxIn) {
 // GetType retruns the input type as a InputType
 func (in *Input) GetType() InputType {
 	if in.inputType != 0 {
+		// return the cached input type
 		return in.inputType
+	}
+
+	if in.IsCoinbase() {
+		return InCOINBASE
 	} else if in.SpendsP2PKH() {
 		return InP2PKH
 	} else if in.SpendsP2SH() {
@@ -105,6 +111,20 @@ func (in *Input) SpendsNativeSegWit() bool {
 	pbs := in.ScriptSig.ParseWithPanic()
 	if len(pbs) == 0 && in.HasWitness() {
 		return in.SpendsP2WPKH() || in.SpendsP2WSH()
+	}
+	return false
+}
+
+// IsCoinbase checks if an input is a coinbase input by checking the previous-
+// output-index to be equal to 0xffffffff and then checking the previous-tx-hash
+// to be all zero.
+func (in *Input) IsCoinbase() bool {
+	// first do the inexpensive check if equal to 0xffffffff
+	if in.Outpoint.OutputIndex == 0xffffffff {
+		// only then check the more expensive equal for byte arrays
+		if bytes.Equal(in.Outpoint.PrevTxHash[:], make([]byte, 32)) {
+			return true
+		}
 	}
 	return false
 }

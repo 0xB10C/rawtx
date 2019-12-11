@@ -416,7 +416,7 @@ func TestInputGetType(t *testing.T) {
 	txm[tx7] = []InputType{InP2PKH}
 	txm[tx8] = []InputType{InP2WSH}
 	txm[tx9] = []InputType{InP2WPKH}
-	txm[tx10] = []InputType{InUNKNOWN}
+	txm[tx10] = []InputType{InCOINBASE}
 	txm[tx11] = []InputType{InP2SH, InP2SH, InP2SH, InP2SH, InP2SH, InP2SH, InP2SH}
 	txm[tx12] = []InputType{InP2PKH}
 	txm[tx13] = []InputType{InP2PKH}
@@ -427,6 +427,7 @@ func TestInputGetType(t *testing.T) {
 	txm[tx21] = []InputType{InP2WSH}
 	txm[tx22] = []InputType{InP2WSH}
 	txm[tx23] = []InputType{InP2PK}
+	txm[tx24] = []InputType{InCOINBASE}
 
 	for txString, expexted := range txm {
 		tx, err := StringToTx(txString)
