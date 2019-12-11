@@ -8,7 +8,7 @@ A Golang module that helps you answer questions about raw bitcoin transactions, 
 
 ### Transactions
 
-Transactions can be deserialized [from a hex string][50] or [from][51] a [wire.MsgTx][52]. 
+Transactions can be deserialized [from a hex string][50] or [from][51] a [wire.MsgTx][52].
 Based on that following questions can be answered.
 
 - [x] [How many inputs?][60]
@@ -44,7 +44,7 @@ Based on that following questions can be answered.
 [71]: https://www.godoc.org/github.com/0xb10c/rawtx/#Tx.GetSizeWithWitness
 [72]: https://www.godoc.org/github.com/0xb10c/rawtx/#Tx.GetSizeWithoutWitness
 
-### Input and Output type 
+### Input and Output type
 
 - [x] [What type has this input?][24]
 - [x] [What type has this output?][25]
@@ -101,24 +101,24 @@ It has a `String()` method which displays the OP codes in a bitcoin developer re
 
 ```go away
 bs1 := BitcoinScript{0x6e, 0x87, 0x91, 0x69, 0xa7, 0x7c, 0xa7, 0x87}
-pbs1 := bs1.ParseWithPanic()
+pbs1 := bs1.Parse()
 fmt.Println(pbs1.String())
 // -> OP_2DUP OP_EQUAL OP_NOT OP_VERIFY OP_SHA1 OP_SWAP OP_SHA1 OP_EQUAL
 ```
 
 ```go awayy
 bs2 = BitcoinScript{byte(OpRETURN), byte(OpDATA2), byte(OpCHECKLOCKTIMEVERIFY), byte(OpDATA12)}
-pbs2 = bs2.ParseWithPanic()
+pbs2 = bs2.Parse()
 fmt.Println(pbs2.String())
 // -> OP_RETURN OP_DATA_2(b10c)
 ```
 
-The actual [OpCode][33] behind the ParsedOpCode can, but doesn't have to push data. You can check if a ParsedOpCode is 
+The actual [OpCode][33] behind the ParsedOpCode can, but doesn't have to push data. You can check if a ParsedOpCode is
 - [x] a [signature?][34] (and [what's the SigHash?][37])
 - [x] a [compressed public key?][35]
 - [x] an [uncompressed public key?][36]
 - [x] or either a [compressed or uncompressed public key?][38]
-- [x] or compare it any other OpCode.  
+- [x] or compare it any other OpCode.
 
 [30]: https://www.godoc.org/github.com/0xb10c/rawtx/#BitcoinScript
 [31]: https://www.godoc.org/github.com/0xb10c/rawtx/#ParsedBitcoinScript

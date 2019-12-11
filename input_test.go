@@ -31,7 +31,7 @@ func TestInputSpendsNativeSegWit(t *testing.T) {
 			result := in.SpendsNativeSegWit()
 			if result != expexted[index] {
 				t.Errorf("Expexted SpendsNativeSegWit==%t at index %d, but got %t", expexted[index], index, result)
-				pbs := in.ScriptSig.ParseWithPanic()
+				pbs := in.ScriptSig.Parse()
 				t.Errorf("input script sig: %s", pbs.String())
 			}
 		}
@@ -65,7 +65,7 @@ func TestSpendsNestedSegWit(t *testing.T) {
 			result := in.SpendsNestedSegWit()
 			if result != expexted[index] {
 				t.Errorf("Expexted SpendsNestedSegWit==%t at index %d, but got %t", expexted[index], index, result)
-				pbs := in.ScriptSig.ParseWithPanic()
+				pbs := in.ScriptSig.Parse()
 				t.Errorf("input script sig: %s", pbs.String())
 			}
 		}
@@ -98,7 +98,7 @@ func TestSpendsNestedP2WPKH(t *testing.T) {
 			result := in.SpendsNestedP2WPKH()
 			if result != expexted[index] {
 				t.Errorf("Expexted SpendsNestedP2WPKH==%t at index %d, but got %t", expexted[index], index, result)
-				pbs := in.ScriptSig.ParseWithPanic()
+				pbs := in.ScriptSig.Parse()
 				t.Errorf("input script sig: %s", pbs.String())
 			}
 		}
@@ -132,7 +132,7 @@ func TestSpendsNestedP2WSH(t *testing.T) {
 			result := in.SpendsNestedP2WSH()
 			if result != expexted[index] {
 				t.Errorf("Expexted SpendsNestedP2WSH==%t at index %d, but got %t", expexted[index], index, result)
-				pbs := in.ScriptSig.ParseWithPanic()
+				pbs := in.ScriptSig.Parse()
 				t.Errorf("input script sig: %s", pbs.String())
 			}
 		}
@@ -167,7 +167,7 @@ func TestSpendsP2PKH(t *testing.T) {
 			result := in.SpendsP2PKH()
 			if result != expexted[index] {
 				t.Errorf("Expexted SpendsP2PKH==%t at index %d, but got %t", expexted[index], index, result)
-				pbs := in.ScriptSig.ParseWithPanic()
+				pbs := in.ScriptSig.Parse()
 				t.Errorf("input script sig: %s", pbs.String())
 			}
 		}
@@ -192,7 +192,7 @@ func TestSpendsP2PKHWithIsCompressed(t *testing.T) {
 			spends, compressed := in.SpendsP2PKHWithIsCompressed()
 			if spends != expexted[index][0] || compressed != expexted[index][1] {
 				t.Errorf("Expexted SpendsP2PKHWithIsCompressed=={%v} at index %d, but got {%t,%t}", expexted[index], index, spends, compressed)
-				pbs := in.ScriptSig.ParseWithPanic()
+				pbs := in.ScriptSig.Parse()
 				t.Errorf("input script sig: %s", pbs.String())
 			}
 		}
@@ -229,7 +229,7 @@ func TestSpendsP2PK(t *testing.T) {
 			result := in.SpendsP2PK()
 			if result != expexted[index] {
 				t.Errorf("Expexted SpendsP2PK==%t at index %d, but got %t", expexted[index], index, result)
-				pbs := in.ScriptSig.ParseWithPanic()
+				pbs := in.ScriptSig.Parse()
 				t.Errorf("input script sig: %s", pbs.String())
 			}
 		}
@@ -261,7 +261,7 @@ func TestSpendsP2SH(t *testing.T) {
 			result := in.SpendsP2SH()
 			if result != expexted[index] {
 				t.Errorf("Expexted SpendsP2SH==%t at index %d, but got %t", expexted[index], index, result)
-				pbs := in.ScriptSig.ParseWithPanic()
+				pbs := in.ScriptSig.Parse()
 				t.Errorf("input script sig: %s", pbs.String())
 			}
 		}
@@ -323,7 +323,7 @@ func TestSpendsP2WPKH(t *testing.T) {
 			result := in.SpendsP2WPKH()
 			if result != expexted[index] {
 				t.Errorf("Expexted SpendsP2WPKH==%t at index %d, but got %t", expexted[index], index, result)
-				pbs := in.ScriptSig.ParseWithPanic()
+				pbs := in.ScriptSig.Parse()
 				t.Errorf("input script sig: %s", pbs.String())
 			}
 		}
@@ -360,7 +360,7 @@ func TestSpendsP2MS(t *testing.T) {
 			result := in.SpendsP2MS()
 			if result != expexted[index] {
 				t.Errorf("Expexted SpendsP2MS==%t at index %d, but got %t", expexted[index], index, result)
-				pbs := in.ScriptSig.ParseWithPanic()
+				pbs := in.ScriptSig.Parse()
 				t.Errorf("input script sig: %s", pbs.String())
 			}
 		}
@@ -398,7 +398,7 @@ func TestIsLNUniliteralClosing(t *testing.T) {
 			result := in.IsLNUniliteralClosing()
 			if result != expexted[index] {
 				t.Errorf("Expexted IsLNChannelClosing==%t at index %d, but got %t", expexted[index], index, result)
-				pbs := in.ScriptSig.ParseWithPanic()
+				pbs := in.ScriptSig.Parse()
 				t.Errorf("input script sig: %s", pbs.String())
 			}
 		}
@@ -439,7 +439,7 @@ func TestInputGetType(t *testing.T) {
 			result := in.GetType()
 			if result != expexted[index] {
 				t.Errorf("Expexted GetType==%s at index %d, but got %s", expexted[index], index, result)
-				pbs := in.ScriptSig.ParseWithPanic()
+				pbs := in.ScriptSig.Parse()
 				t.Errorf("input script sig: %s", pbs.String())
 			}
 		}

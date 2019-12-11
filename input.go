@@ -108,7 +108,7 @@ func (in *Input) HasWitness() bool {
 // SpendsNativeSegWit checks if the input spend is a native SegWit input.
 // A native SegWit input has a witness but an empty scriptSig.
 func (in *Input) SpendsNativeSegWit() bool {
-	pbs := in.ScriptSig.ParseWithPanic()
+	pbs := in.ScriptSig.Parse()
 	if len(pbs) == 0 && in.HasWitness() {
 		return in.SpendsP2WPKH() || in.SpendsP2WSH()
 	}
@@ -163,7 +163,7 @@ func (in *Input) SpendsP2WPKH() bool {
 // OP_0 <signature> [<signature>] [<signature>] (where [] means optional)
 func (in *Input) SpendsP2MS() bool {
 	if !in.HasWitness() && len(in.ScriptSig) > 0 {
-		pbs := in.ScriptSig.ParseWithPanic()
+		pbs := in.ScriptSig.Parse()
 		if len(pbs) >= 2 && pbs[0].OpCode == Op0 {
 			switch len(pbs) - 1 {
 			case 1: // has one signature for a 1-of-(1/2/3) multisig
@@ -199,10 +199,10 @@ func (in *Input) SpendsNestedSegWit() bool {
 // A nested P2WPKH input has a witness and the scriptSig looks like
 // OP_DATA_22(OP_0 OP_DATA_20(20 byte hash))
 func (in *Input) SpendsNestedP2WPKH() bool {
-	pbs := in.ScriptSig.ParseWithPanic()
+	pbs := in.ScriptSig.Parse()
 	if in.HasWitness() && len(pbs) == 1 && pbs[0].OpCode == OpDATA22 {
 		var inner BitcoinScript = pbs[0].PushedData
-		innerPbs := inner.ParseWithPanic()
+		innerPbs := inner.Parse()
 		if len(innerPbs) == 2 &&
 			innerPbs[0].OpCode == Op0 &&
 			innerPbs[1].OpCode == OpDATA20 {
@@ -216,10 +216,10 @@ func (in *Input) SpendsNestedP2WPKH() bool {
 // A nested P2WSH input has a witness and the scriptSig looks like
 // OP_DATA_34(OP_0 OP_DATA_32(32 byte hash))
 func (in *Input) SpendsNestedP2WSH() bool {
-	pbs := in.ScriptSig.ParseWithPanic()
+	pbs := in.ScriptSig.Parse()
 	if in.HasWitness() && len(pbs) == 1 && pbs[0].OpCode == OpDATA34 {
 		var inner BitcoinScript = pbs[0].PushedData
-		innerPbs := inner.ParseWithPanic()
+		innerPbs := inner.Parse()
 		if len(innerPbs) == 2 &&
 			innerPbs[0].OpCode == Op0 &&
 			innerPbs[1].OpCode == OpDATA32 {
@@ -232,7 +232,7 @@ func (in *Input) SpendsNestedP2WSH() bool {
 // SpendsP2PKH checks if the input spend is a P2PKH input.
 // <signature> <pubkey>
 func (in *Input) SpendsP2PKH() (spendsP2PKH bool) {
-	pbs := in.ScriptSig.ParseWithPanic()
+	pbs := in.ScriptSig.Parse()
 	if !in.HasWitness() && len(pbs) == 2 {
 		return pbs[0].IsSignature() && pbs[1].IsPubKey()
 	}
@@ -243,7 +243,7 @@ func (in *Input) SpendsP2PKH() (spendsP2PKH bool) {
 // Additionally it returns a boolean indicating if the revealed pubkey is compressed.
 // <signature> <pubkey>
 func (in *Input) SpendsP2PKHWithIsCompressed() (spendsP2PKH bool, isCompressedPubKey bool) {
-	pbs := in.ScriptSig.ParseWithPanic()
+	pbs := in.ScriptSig.Parse()
 	if !in.HasWitness() && len(pbs) == 2 {
 		isPubKey, isCompressedPubKey := pbs[1].IsPubKeyWithIsCompressed()
 		return pbs[0].IsSignature() && isPubKey, isCompressedPubKey
@@ -255,7 +255,7 @@ func (in *Input) SpendsP2PKHWithIsCompressed() (spendsP2PKH bool, isCompressedPu
 // A P2PK input only contains the signature in the scriptSig.
 // <signature>
 func (in *Input) SpendsP2PK() bool {
-	pbs := in.ScriptSig.ParseWithPanic()
+	pbs := in.ScriptSig.Parse()
 	if !in.HasWitness() && len(pbs) == 1 {
 		return pbs[0].IsSignature()
 	}
@@ -266,7 +266,7 @@ func (in *Input) SpendsP2PK() bool {
 // A P2SH input has a redeemscript push at the end of the scriptSig,
 // which is neither a signature or a pubkey.
 func (in *Input) SpendsP2SH() (spendsP2SH bool) {
-	pbs := in.ScriptSig.ParseWithPanic()
+	pbs := in.ScriptSig.Parse()
 	if !in.HasWitness() && len(pbs) > 0 {
 		redeemScript := pbs[len(pbs)-1]
 		return !redeemScript.IsSignature() && !redeemScript.IsPubKey() // is not a signature and is not a pubkey
@@ -278,7 +278,7 @@ func (in *Input) SpendsP2SH() (spendsP2SH bool) {
 // The returned redeemScript is empty if the input does not spend a P2SH input.
 func (in *Input) GetP2SHRedeemScript() (redeemScript BitcoinScript) {
 	if in.SpendsP2SH() {
-		pbs := in.ScriptSig.ParseWithPanic()
+		pbs := in.ScriptSig.Parse()
 		if !in.HasWitness() && len(pbs) > 0 {
 			return pbs[len(pbs)-1].PushedData
 		}
@@ -348,7 +348,7 @@ func (in *Input) SpendsMultisig() bool {
 //   OP_CHECKSIG
 func (in *Input) IsLNUniliteralClosing() bool {
 	redeemScript := in.GetP2WSHRedeemScript()
-	pbs := redeemScript.ParseWithPanic()
+	pbs := redeemScript.Parse()
 	if len(pbs) == 9 {
 		if pbs[0].OpCode == OpIF && pbs[1].IsPubKey() &&
 			pbs[2].OpCode == OpELSE && pbs[4].OpCode == OpCHECKSEQUENCEVERIFY && pbs[5].OpCode == OpDROP && pbs[6].IsPubKey() &&

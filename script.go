@@ -3,7 +3,6 @@ package rawtx
 import (
 	"encoding/binary"
 	"encoding/hex"
-	"fmt"
 	"strconv"
 	"strings"
 )
@@ -42,79 +41,95 @@ func (pbs ParsedBitcoinScript) String() (s string) {
 	return strings.TrimSuffix(s, " ")
 }
 
-// ParseWithPanic parses a BitcoinScript and returns contained opcodes
-// and data pushes separated as a ParsedBitcoinScript.
-// Parse panics if a BitcoinScript can not be parsed!
-func (s BitcoinScript) ParseWithPanic() (parsed ParsedBitcoinScript) {
+// Parse parses the BitcoinScript and returns a ParsedBitcoinScript. It expects
+// a script with correctly formatted data pushes, or it might return
+// ParsedOpCodes with shorter than expected data for pushes-past-script-end.
+func (s BitcoinScript) Parse() (parsed ParsedBitcoinScript) {
 	if len(s) == 0 {
 		return parsed
 	}
 
 	parsed = make([]ParsedOpCode, 0)
 	for len(s) > 0 {
-		p, remainder, err := s.PopFront()
-		if err != nil {
-			panic(fmt.Errorf("could not parse the BitcoinScript: %s", err))
-		}
+		p, remainder := s.parseNextOpCode()
 		parsed = append(parsed, p)
 		s = remainder
 	}
 	return
 }
 
-// PopFront returns the first OpCode and it's data push as a ParsedOpCode.
-// Additionally the remaining BitcoinScript is returned.
-func (s BitcoinScript) PopFront() (front ParsedOpCode, remainder BitcoinScript, err error) {
+// parseNextOpCode parses the next OpCode in the BitcoinScript. It returns the
+// parsed OpCode and the remaining BitcoinScript.
+func (s BitcoinScript) parseNextOpCode() (front ParsedOpCode, remainder BitcoinScript) {
 	opCode := OpCode(s[0])
 
-	if (opCode >= OpDATA1 && opCode <= OpDATA75) || opCode == OpPUSHDATA1 || opCode == OpPUSHDATA2 || opCode == OpPUSHDATA4 {
-		// the OP code indicates a data push
-		length, offset, err := readPushLength(s)
-		if err != nil {
-			return front, remainder, fmt.Errorf("could not PopFront: %s", err)
+	if opCode.IsDataPushOpCode() {
+		dataPushLength, encodingLength := s.getDataPushLength()
+
+		var opCodeLength int = dataPushLength + encodingLength
+
+		// BitcoinScripts, for example in coinbase inputs, can push past the script
+		// length.
+		if opCodeLength > len(s) {
+			opCodeLength = len(s)
 		}
 
-		if length+offset > len(s) {
-			return front, remainder, fmt.Errorf("invalid data push in script after %s", OpCodeStringMap[opCode])
-		}
-		return ParsedOpCode{OpCode: OpCode(opCode), PushedData: s[offset : length+offset]}, s[length+offset:], nil
+		return ParsedOpCode{OpCode: OpCode(opCode), PushedData: s[encodingLength:opCodeLength]}, s[opCodeLength:]
 	}
 
-	// the OP code does not push data
-	return ParsedOpCode{OpCode: OpCode(opCode)}, s[1:], nil
+	return ParsedOpCode{OpCode: OpCode(opCode)}, s[1:]
 }
 
-// readPushLength returns the length of the pushed bytes at the beginning of the script
-// and an offset at which the length encoding ends and the pushed data begins
-func readPushLength(s []byte) (length int, offset int, err error) {
+// getDataPushLength expects the next OpCode in the BitcoinScript to be an
+// OpCode pushing data to the stack.
+// The length of the pushed data (`dataPushLength`) and the number of bytes used
+// to encode the data push `encodingLength` (including a byte for the OpCode)
+// are returned.
+//
+// If the BitcoinScript is not long enough to encode a valid data push OpCode
+// then both the dataPushLength and the encodingLength are 0.
+func (s BitcoinScript) getDataPushLength() (dataPushLength int, encodingLength int) {
 	if len(s) > 0 {
 		opCode := OpCode(s[0])
+
 		if opCode >= OpDATA1 && opCode <= OpDATA75 {
-			return int(opCode), 1, nil
+			dataPushLength = int(opCode)
+			encodingLength = 1 // 1 byte OpCode
+			return
+
 		} else if opCode == OpPUSHDATA1 {
-			if len(s) >= 5 {
-				return int(s[1]), 1 + 1, nil // 1 byte OPcode + 1 byte length
+			if len(s) >= 2 {
+				dataPushLength = int(s[1])
+				encodingLength = 1 + 1 // 1 byte OpCode + 1 byte to encode the data push length
+				return
 			}
-			return 0, 0, fmt.Errorf("could not read data push length for %s", OpCodeStringMap[OpPUSHDATA1])
 		} else if opCode == OpPUSHDATA2 {
 			if len(s) >= 3 {
-				return int(binary.LittleEndian.Uint16(s[1:4])), 1 + 2, nil // 1 byte OPcode + 2 byte length
+				dataPushLength = int(binary.LittleEndian.Uint16(s[1:4]))
+				encodingLength = 1 + 2 // 1 byte OpCode + 2 byte to encode the data push length
+				return
 			}
-			return 0, 0, fmt.Errorf("could not read data push length for %s", OpCodeStringMap[OpPUSHDATA2])
 		} else if opCode == OpPUSHDATA4 {
 			if len(s) >= 5 {
-				return int(binary.LittleEndian.Uint16(s[1:6])), 1 + 4, nil // 1 byte OPcode + 4 byte length
+				dataPushLength = int(binary.LittleEndian.Uint16(s[1:6]))
+				encodingLength = 1 + 4 // 1 byte OpCode + 4 byte to encode the data push length
+				return
 			}
-			return 0, 0, fmt.Errorf("could not read data push length for %s", OpCodeStringMap[OpPUSHDATA4])
 		}
+		// fallback if the remaining bytes in the BitcoinScript are less than the
+		// data push OpCode would need
+		dataPushLength = 0
+		encodingLength = len(s)
+		return
 	}
-	return 0, 0, fmt.Errorf("s does not contain any data")
+	return 0, 0
 }
 
-// IsSignature checks a two byte slices if they could represent a
-// DER encoded signature. <sig length> <|signature|> <sig hash>
-// While the signature looks like:
-// <DER marker> <Sig length> <R marker> <R length> <|R value|> <S marker> <S length> <|S value|> <sig hash>
+// IsSignature checks a ParsedOpCode if it could represent a DER encoded
+// signature.
+//  <sig length> <|signature|> <sig hash>
+// A signature looks like:
+//  <DER marker> <Sig length> <R marker> <R length> <|R value|> <S marker> <S length> <|S value|> <sig hash>
 func (poc ParsedOpCode) IsSignature() bool {
 	const derMarker = 0x30
 	const derValueMarker = 0x02
@@ -181,7 +196,7 @@ func (s BitcoinScript) IsMultisigScript() (isMultisig bool, numRequiredSigs int,
 		return false, 0, 0
 	}
 
-	parsed := s.ParseWithPanic()
+	parsed := s.Parse()
 	pLength := len(parsed)
 	pLast := parsed[pLength-1] // last item in `parsed`
 

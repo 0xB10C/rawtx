@@ -29,7 +29,7 @@ func TestIsOPReturnOutput(t *testing.T) {
 			result := out.IsOPReturnOutput()
 			if result != expexted[index] {
 				t.Errorf("Expexted IsOPReturnOutput==%t at index %d, but got %t", expexted[index], index, result)
-				ps := out.ScriptPubKey.ParseWithPanic()
+				ps := out.ScriptPubKey.Parse()
 				t.Errorf("input scriptPubKey: %s", ps.String())
 			}
 		}
@@ -70,7 +70,7 @@ func TestGetOPReturnData(t *testing.T) {
 			is, opcode := out.GetOPReturnData()
 			if is != expexted[index].Is || len(opcode.PushedData) != expexted[index].Length || (len(opcode.PushedData) > 0 && opcode.PushedData[len(opcode.PushedData)-1] != expexted[index].LastByte) {
 				t.Errorf("Expexted GetOPReturnData==%v at index %d, but got [%t, %d, %d]", expexted[index], index, is, len(opcode.PushedData), opcode.PushedData[len(opcode.PushedData)-1])
-				ps := out.ScriptPubKey.ParseWithPanic()
+				ps := out.ScriptPubKey.Parse()
 				t.Errorf("input scriptPubKey: %s", ps.String())
 			}
 		}
@@ -103,7 +103,7 @@ func TestIsP2PKHOutput(t *testing.T) {
 			result := out.IsP2PKHOutput()
 			if result != expexted[index] {
 				t.Errorf("Expexted IsP2PKHOutput==%t at index %d, but got %t", expexted[index], index, result)
-				ps := out.ScriptPubKey.ParseWithPanic()
+				ps := out.ScriptPubKey.Parse()
 				t.Errorf("input scriptPubKey: %s", ps.String())
 			}
 		}
@@ -137,7 +137,7 @@ func TestIsP2WPKHV0Output(t *testing.T) {
 			result := out.IsP2WPKHV0Output()
 			if result != expexted[index] {
 				t.Errorf("Expexted IsP2WPKHOutput==%t at index %d, but got %t", expexted[index], index, result)
-				ps := out.ScriptPubKey.ParseWithPanic()
+				ps := out.ScriptPubKey.Parse()
 				t.Errorf("input scriptPubKey: %s", ps.String())
 			}
 		}
@@ -170,7 +170,7 @@ func TestIsP2SHOutput(t *testing.T) {
 			result := out.IsP2SHOutput()
 			if result != expexted[index] {
 				t.Errorf("Expexted IsP2SHOutput==%t at index %d, but got %t", expexted[index], index, result)
-				ps := out.ScriptPubKey.ParseWithPanic()
+				ps := out.ScriptPubKey.Parse()
 				t.Errorf("input scriptPubKey: %s", ps.String())
 			}
 		}
@@ -203,7 +203,7 @@ func TestIsP2WSHV0Output(t *testing.T) {
 			result := out.IsP2WSHV0Output()
 			if result != expexted[index] {
 				t.Errorf("Expexted IsP2WSHOutput==%t at index %d, but got %t", expexted[index], index, result)
-				ps := out.ScriptPubKey.ParseWithPanic()
+				ps := out.ScriptPubKey.Parse()
 				t.Errorf("input scriptPubKey: %s", ps.String())
 			}
 		}
@@ -248,7 +248,7 @@ func TestIsP2MSOutput(t *testing.T) {
 			is, m, n := out.IsP2MSOutput()
 			if is != expexted[index].is || m != expexted[index].m || n != expexted[index].n {
 				t.Errorf("Expexted IsP2MSOutput==[%t, %d-of-%d] at index %d, but got [%t, %d-of-%d]", expexted[index].is, expexted[index].m, expexted[index].n, index, is, m, n)
-				ps := out.ScriptPubKey.ParseWithPanic()
+				ps := out.ScriptPubKey.Parse()
 				t.Errorf("input scriptPubKey: %s", ps.String())
 			}
 		}
@@ -277,7 +277,7 @@ func TestIsP2PKOutput(t *testing.T) {
 			result := out.IsP2PKOutput()
 			if result != expexted[index] {
 				t.Errorf("Expexted IsP2PKOutput==%t at index %d, but got %t", expexted[index], index, result)
-				ps := out.ScriptPubKey.ParseWithPanic()
+				ps := out.ScriptPubKey.Parse()
 				t.Errorf("input scriptPubKey: %s", ps.String())
 			}
 		}
@@ -320,7 +320,7 @@ func TestOutputGetType(t *testing.T) {
 			result := out.GetType()
 			if result != expexted[index] {
 				t.Errorf("Expexted GetType==%s at index %d, but got %s", expexted[index], index, result)
-				pbs := out.ScriptPubKey.ParseWithPanic()
+				pbs := out.ScriptPubKey.Parse()
 				t.Errorf("input script pub key: %s", pbs.String())
 			}
 		}

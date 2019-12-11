@@ -1,6 +1,6 @@
 package rawtx
 
-// OpCode represents a bitcoin operation code
+// OpCode represents a Bitcoin operation code
 type OpCode byte
 
 // Bitcoin OP Codes.
@@ -523,4 +523,12 @@ var OpCodeStringMap = map[OpCode]string{
 	OpPUBKEYHASH:          "OP_PUBKEYHASH",
 	OpPUBKEY:              "OP_PUBKEY",
 	OpINVALIDOPCODE:       "OP_INVALIDOPCODE",
+}
+
+// IsDataPushOpCode indicates if a opCode pushes data to the stack
+func (opCode OpCode) IsDataPushOpCode() bool {
+	return (opCode >= OpDATA1 && opCode <= OpDATA75) ||
+		opCode == OpPUSHDATA1 ||
+		opCode == OpPUSHDATA2 ||
+		opCode == OpPUSHDATA4
 }

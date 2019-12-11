@@ -75,7 +75,7 @@ func (out *Output) GetType() OutputType {
 //  OP_RETURN <SomeDataPush> <OP_RETURN data>
 func (out *Output) IsOPReturnOutput() (is bool) {
 	if len(out.ScriptPubKey) > 0 {
-		pbs := out.ScriptPubKey.ParseWithPanic()
+		pbs := out.ScriptPubKey.Parse()
 		if pbs[0].OpCode == OpRETURN {
 			return true
 		}
@@ -89,7 +89,7 @@ func (out *Output) IsOPReturnOutput() (is bool) {
 //  OP_RETURN <SomeDataPush> <OP_RETURN data>
 func (out *Output) GetOPReturnData() (bool, ParsedOpCode) {
 	if out.IsOPReturnOutput() {
-		pbs := out.ScriptPubKey.ParseWithPanic()
+		pbs := out.ScriptPubKey.Parse()
 		return true, pbs[1]
 	}
 	return false, ParsedOpCode{}
@@ -100,7 +100,7 @@ func (out *Output) GetOPReturnData() (bool, ParsedOpCode) {
 //  OP_DUP OP_HASH160 OP_DATA_20(20 byte pubKeyHash) OP_EQUALVERIFY OP_CHECKSIG
 //  OP_DUP OP_HASH160 OP_DATA_20(                  ) OP_EQUALVERIFY OP_CHECKSIG
 func (out *Output) IsP2PKHOutput() bool {
-	pbs := out.ScriptPubKey.ParseWithPanic()
+	pbs := out.ScriptPubKey.Parse()
 	if len(pbs) == 5 {
 		if pbs[0].OpCode == OpDUP && // OP_DUP
 			pbs[1].OpCode == OpHASH160 && // OP_HASH160
@@ -117,7 +117,7 @@ func (out *Output) IsP2PKHOutput() bool {
 // A P2SH scriptPubKey looks like:
 //  OP_HASH160 OP_DATA_20(20 byte hash) OP_EQUAL
 func (out *Output) IsP2SHOutput() bool {
-	pbs := out.ScriptPubKey.ParseWithPanic()
+	pbs := out.ScriptPubKey.Parse()
 	if len(pbs) == 3 {
 		if pbs[0].OpCode == OpHASH160 &&
 			pbs[1].OpCode == OpDATA20 && // FIXME: could also be inefficient with OpPUSHDATA1 / 2 / 4  ?
@@ -132,7 +132,7 @@ func (out *Output) IsP2SHOutput() bool {
 // A P2WPKH V0 output looks like:
 //  OP_0 OP_DATA_20(20 byte hash) (where the leading OP_0 indicates witness program 0)
 func (out *Output) IsP2WPKHV0Output() bool {
-	pbs := out.ScriptPubKey.ParseWithPanic()
+	pbs := out.ScriptPubKey.Parse()
 	if len(pbs) == 2 {
 		if pbs[0].OpCode == Op0 && // witness program 0
 			pbs[1].OpCode == OpDATA20 { // OP_DATA_20 // FIXME: could also be inefficient with OpPUSHDATA1 / 2 / 4  ?
@@ -146,7 +146,7 @@ func (out *Output) IsP2WPKHV0Output() bool {
 // A P2WSH V0 output looks like:
 //  OP_0 (as witness program 0) OP_DATA_32(32 byte hash)
 func (out *Output) IsP2WSHV0Output() bool {
-	pbs := out.ScriptPubKey.ParseWithPanic()
+	pbs := out.ScriptPubKey.Parse()
 	if len(pbs) == 2 {
 		if pbs[0].OpCode == Op0 && // witness program 0
 			pbs[1].OpCode == OpDATA32 { // OP_DATA_32 // FIXME: could also be inefficient with OpPUSHDATA1 / 2 / 4  ?
@@ -167,7 +167,7 @@ func (out *Output) IsP2MSOutput() (is bool, m int, n int) {
 // A P2PK output looks like:
 //  PubKey OP_CHECKSIG
 func (out *Output) IsP2PKOutput() bool {
-	pbs := out.ScriptPubKey.ParseWithPanic()
+	pbs := out.ScriptPubKey.Parse()
 	if len(pbs) == 2 {
 		if pbs[0].IsPubKey() && pbs[1].OpCode == OpCHECKSIG {
 			return true
