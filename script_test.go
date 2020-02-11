@@ -67,29 +67,9 @@ func TestGetDataPushLengthPanic(t *testing.T) {
 }
 
 func TestIsMultisigScript(t *testing.T) {
-	txm := make(map[string][]bool)
-	txm[tx1] = []bool{false, false}                              // P2PK, P2WPKH
-	txm[tx2] = []bool{false}                                     // P2SH-P2WPKH
-	txm[tx3] = []bool{false, false}                              // P2PK, P2WSH
-	txm[tx4] = []bool{false, false}                              // P2WSH, P2WSH
-	txm[tx5] = []bool{true}                                      // P2SH-P2WSH 6-of-6
-	txm[tx6] = []bool{false}                                     // P2WSH
-	txm[tx7] = []bool{false}                                     // P2PKH
-	txm[tx8] = []bool{true}                                      // P2WSH
-	txm[tx9] = []bool{false}                                     // P2WPKH
-	txm[tx10] = []bool{false}                                    // P2PK
-	txm[tx11] = []bool{true, true, true, true, true, true, true} // P2SH,P2SH,P2SH,P2SH,P2SH,P2SH,P2SH
-	txm[tx12] = []bool{false}                                    // P2PKH
-	txm[tx13] = []bool{false}                                    // P2PKH
-	txm[tx14] = []bool{false}                                    // P2PKH
-	txm[tx16] = []bool{false}                                    // P2MS
-	txm[tx17] = []bool{false}                                    // P2MS
-	txm[tx18] = []bool{false}                                    // P2MS
-	txm[tx20] = []bool{true}
-	txm[tx22] = []bool{true} //  P2WSH 2-of-3
-
-	for txString, expected := range txm {
-		tx, err := StringToTx(txString)
+	testTxns := GetTestTransactions()
+	for _, testTx := range testTxns {
+		tx, err := StringToTx(testTx.RawTx)
 		if err != nil {
 			t.Error(err.Error())
 		}
@@ -97,20 +77,19 @@ func TestIsMultisigScript(t *testing.T) {
 		for index, in := range tx.Inputs {
 			var redeemScript BitcoinScript
 
-			redeemScript = in.GetNestedP2WSHRedeemScript()
-
-			if len(redeemScript) == 0 {
+			switch in.GetType() {
+			case InP2SH_P2WSH:
+				redeemScript = in.GetNestedP2WSHRedeemScript()
+			case InP2WSH:
 				redeemScript = in.GetP2WSHRedeemScript()
-			}
-
-			if len(redeemScript) == 0 {
+			case InP2SH:
 				redeemScript = in.GetP2SHRedeemScript()
 			}
 
-			result, m, n := redeemScript.IsMultisigScript()
-			if result != expected[index] {
-				t.Errorf("expected IsMultisigScript={%t, %d, %d}, got %t", expected[index], m, n, result)
-				t.Errorf("redeemScript %s", redeemScript.Parse())
+			is, m, n := redeemScript.IsMultisigScript()
+			expected := testTx.MultisigType[index]
+			if is != expected.is || m != expected.m || n != expected.n {
+				t.Errorf("Expected IsMultisigScript={%t, %d, %d}, but got {%t, %d, %d} for testTx: %+v", expected.is, expected.m, expected.n, is, m, n, testTx)
 			}
 		}
 	}
@@ -125,33 +104,6 @@ func TestIsMultisigScript(t *testing.T) {
 	result, m, n = redeemScript.IsMultisigScript()
 	if result != false || m != 0 || n != 0 {
 		t.Errorf("expected %s not to be a valid Multisig script", redeemScript.Parse())
-	}
-}
-
-func TestGetSigHash(t *testing.T) {
-	txm := make(map[string][]bool)
-	txm[tx1] = []bool{false, false} // P2PK, P2WPKH
-	txm[tx7] = []bool{false}        // P2PKH
-	txm[tx10] = []bool{false}       // P2PK
-	txm[tx12] = []bool{false}       // P2PKH
-
-	for txString := range txm {
-		tx, err := StringToTx(txString)
-		if err != nil {
-			t.Error(err.Error())
-		}
-
-		for _, in := range tx.Inputs {
-			for _, p := range in.ScriptSig.Parse() {
-				if p.GetSigHash() != 0x1 {
-					if p.IsSignature() {
-						t.Errorf("Expected GetSigHash=%#x, but got %#x", 0x1, p.GetSigHash())
-					} else if p.GetSigHash() != 0x00 {
-						t.Errorf("Expected GetSigHash=%#x because the input is no signature, but got %#x", 0x00, p.GetSigHash())
-					}
-				}
-			}
-		}
 	}
 }
 

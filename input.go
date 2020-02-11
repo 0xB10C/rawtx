@@ -2,6 +2,7 @@ package rawtx
 
 import (
 	"bytes"
+
 	"github.com/btcsuite/btcd/wire"
 )
 
@@ -19,20 +20,22 @@ const (
 	InP2SH_P2WSH
 	InP2WSH
 	InCOINBASE
+	InCOINBASE_WITNESS
 	InUNKNOWN
 )
 
 var inputTypeStringMap = map[InputType]string{
-	InP2PK:        "P2PK",
-	InP2PKH:       "P2PKH",
-	InP2SH_P2WPKH: "P2SH_P2WPKH",
-	InP2WPKH:      "P2WPKH",
-	InP2MS:        "P2MS",
-	InP2SH:        "P2SH",
-	InP2SH_P2WSH:  "P2SH_P2WSH",
-	InP2WSH:       "P2WSH",
-	InCOINBASE:    "COINBASE",
-	InUNKNOWN:     "UNKNOWN",
+	InP2PK:             "P2PK",
+	InP2PKH:            "P2PKH",
+	InP2SH_P2WPKH:      "P2SH_P2WPKH",
+	InP2WPKH:           "P2WPKH",
+	InP2MS:             "P2MS",
+	InP2SH:             "P2SH",
+	InP2SH_P2WSH:       "P2SH_P2WSH",
+	InP2WSH:            "P2WSH",
+	InCOINBASE:         "COINBASE",
+	InCOINBASE_WITNESS: "COINBASE_WITNESS",
+	InUNKNOWN:          "UNKNOWN",
 }
 
 func (it InputType) String() string {
@@ -78,8 +81,10 @@ func (in *Input) GetType() InputType {
 		return in.inputType
 	}
 
-	if in.IsCoinbase() {
+	if in.IsCoinbaseWithoutWitness() {
 		return InCOINBASE
+	} else if in.IsCoinbaseWithWitness() {
+		return InCOINBASE_WITNESS
 	} else if in.SpendsP2PKH() {
 		return InP2PKH
 	} else if in.SpendsP2SH() {
@@ -115,18 +120,41 @@ func (in *Input) SpendsNativeSegWit() bool {
 	return false
 }
 
-// IsCoinbase checks if an input is a coinbase input by checking the previous-
+// IsCoinbaseWithoutWitness checks if an input is a coinbase input by checking the previous-
 // output-index to be equal to 0xffffffff and then checking the previous-tx-hash
-// to be all zero.
-func (in *Input) IsCoinbase() bool {
+// to be all zero and then checks if the coinbase has a witness.
+func (in *Input) IsCoinbaseWithoutWitness() bool {
 	// first do the inexpensive check if equal to 0xffffffff
 	if in.Outpoint.OutputIndex == 0xffffffff {
 		// only then check the more expensive equal for byte arrays
 		if bytes.Equal(in.Outpoint.PrevTxHash[:], make([]byte, 32)) {
-			return true
+			if !in.HasWitness() {
+				return true
+			}
 		}
 	}
 	return false
+}
+
+// IsCoinbaseWithWitness checks if an input is a coinbase input by checking the previous-
+// output-index to be equal to 0xffffffff and then checking the previous-tx-hash
+// to be all zero and then checks if the coinbase has a witness.
+func (in *Input) IsCoinbaseWithWitness() bool {
+	// first do the inexpensive check if equal to 0xffffffff
+	if in.Outpoint.OutputIndex == 0xffffffff {
+		// only then check the more expensive equal for byte arrays
+		if bytes.Equal(in.Outpoint.PrevTxHash[:], make([]byte, 32)) {
+			if in.HasWitness() {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+// IsCoinbase checks if an input is a coinbase input.
+func (in *Input) IsCoinbase() bool {
+	return in.IsCoinbaseWithWitness() || in.IsCoinbaseWithoutWitness()
 }
 
 // SpendsP2WSH checks if an input spends a P2WSH input.
@@ -266,6 +294,10 @@ func (in *Input) SpendsP2PK() bool {
 // A P2SH input has a redeemscript push at the end of the scriptSig,
 // which is neither a signature or a pubkey.
 func (in *Input) SpendsP2SH() (spendsP2SH bool) {
+	if in.IsCoinbase() {
+		return false
+	}
+
 	pbs := in.ScriptSig.Parse()
 	if !in.HasWitness() && len(pbs) > 0 {
 		redeemScript := pbs[len(pbs)-1]
