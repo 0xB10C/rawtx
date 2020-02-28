@@ -10,7 +10,6 @@ func TestParseEmpty(t *testing.T) {
 	if len(empty.Parse()) != 0 {
 		t.Errorf("The empty BitcoinScript should have a empty ParsedBitcoinScript.")
 	}
-
 }
 
 func TestReadPushLength(t *testing.T) {
@@ -104,6 +103,97 @@ func TestIsMultisigScript(t *testing.T) {
 	result, m, n = redeemScript.IsMultisigScript()
 	if result != false || m != 0 || n != 0 {
 		t.Errorf("expected %s not to be a valid Multisig script", redeemScript.Parse())
+	}
+}
+
+func TestStrictlyDEREncodedECDSASig(t *testing.T) {
+	ECDSASigStrictlyDER := ParsedOpCode{OpCode: OpDATA71, PushedData: []byte{0x30, 0x44, 0x02, 0x20, 0x3c, 0x02, 0xbd, 0x6f, 0x63, 0xe4, 0x79, 0xc7, 0xc6, 0xd1, 0xdc, 0x7d, 0x94, 0x3b, 0x58, 0x4b, 0xa2, 0x03, 0xc6, 0xf1, 0x50, 0x37, 0x9c, 0x78, 0x9f, 0x84, 0xf8, 0xa5, 0xf3, 0x3c, 0x95, 0x12, 0x02, 0x20, 0x1c, 0xcf, 0x01, 0xbb, 0xeb, 0x2c, 0x5f, 0x68, 0xb1, 0x78, 0xab, 0x96, 0xa1, 0xa5, 0x64, 0xaf, 0x66, 0x09, 0xf7, 0x33, 0x87, 0xb9, 0x35, 0x5a, 0x62, 0x65, 0x54, 0x48, 0xb6, 0xa2, 0x7a, 0x43, 0x01}}
+
+	if ECDSASigStrictlyDER.IsCompressedPubKey() {
+		t.Errorf("A DER encoded signature should not be recognized as compressed pubkey")
+	}
+
+	if ECDSASigStrictlyDER.IsUncompressedPubKey() {
+		t.Errorf("A DER encoded signature should not be recognized as uncompressed pubkey")
+	}
+
+	if !ECDSASigStrictlyDER.IsSignature() {
+		t.Errorf("A DER encoded signature should be recognized as a signature")
+	}
+
+	if !ECDSASigStrictlyDER.IsECDSASignature(true) {
+		t.Errorf("A DER encoded signature should be recognized as ECDSA Signature")
+	}
+
+	if !ECDSASigStrictlyDER.IsECDSASignatureInStrictDER() {
+		t.Errorf("A DER encoded signature should be recognized as a strictly DER encoded ECDSA signature")
+	}
+
+	if ECDSASigStrictlyDER.GetSigHash() != 0x01 {
+		t.Errorf("The SigHash of the signature should be 0x01")
+	}
+}
+
+func TestGarbageSignature(t *testing.T) {
+	tooBigOpCodeSig := ParsedOpCode{OpCode: OpDATA75, PushedData: []byte{0x10}}
+	tooSmallOpCodeSig := ParsedOpCode{OpCode: OpDATA6, PushedData: []byte{0x10}}
+	emptyPushDataSig := ParsedOpCode{OpCode: OpDATA33, PushedData: []byte{}}
+
+	if tooBigOpCodeSig.IsCompressedPubKey() {
+		t.Errorf("A garbage signature should not be recognized as compressed pubkey")
+	}
+	if tooBigOpCodeSig.IsUncompressedPubKey() {
+		t.Errorf("A garbage signature should not be recognized as uncompressed pubkey")
+	}
+	if tooBigOpCodeSig.IsSignature() {
+		t.Errorf("A garbage signature should be recognized as a signature")
+	}
+	if tooBigOpCodeSig.IsECDSASignature(false) {
+		t.Errorf("A garbage signature should be recognized as ECDSA Signature")
+	}
+	if tooBigOpCodeSig.IsECDSASignatureInStrictDER() {
+		t.Errorf("A garbage signature should be recognized as a strictly DER encoded ECDSA signature")
+	}
+	if tooBigOpCodeSig.GetSigHash() != 0x00 {
+		t.Errorf("The SigHash of the garbage signature should be invalid (0x00)")
+	}
+
+	if tooSmallOpCodeSig.IsCompressedPubKey() {
+		t.Errorf("A garbage signature should not be recognized as compressed pubkey")
+	}
+	if tooSmallOpCodeSig.IsUncompressedPubKey() {
+		t.Errorf("A garbage signature should not be recognized as uncompressed pubkey")
+	}
+	if tooSmallOpCodeSig.IsSignature() {
+		t.Errorf("A garbage signature should be recognized as a signature")
+	}
+	if tooSmallOpCodeSig.IsECDSASignature(false) {
+		t.Errorf("A garbage signature should be recognized as ECDSA Signature")
+	}
+	if tooSmallOpCodeSig.IsECDSASignatureInStrictDER() {
+		t.Errorf("A garbage signature should be recognized as a strictly DER encoded ECDSA signature")
+	}
+	if tooSmallOpCodeSig.GetSigHash() != 0x00 {
+		t.Errorf("The SigHash of the garbage signature should be invalid (0x00)")
+	}
+
+	if emptyPushDataSig.IsCompressedPubKey() {
+		t.Errorf("A garbage signature should not be recognized as compressed pubkey")
+	}
+	if emptyPushDataSig.IsUncompressedPubKey() {
+		t.Errorf("A garbage signature should not be recognized as uncompressed pubkey")
+	}
+	if emptyPushDataSig.IsSignature() {
+		t.Errorf("A garbage signature should be recognized as a signature")
+	}
+	if emptyPushDataSig.IsECDSASignature(false) {
+		t.Errorf("A garbage signature should be recognized as ECDSA Signature")
+	}
+	if emptyPushDataSig.IsECDSASignatureInStrictDER() {
+		t.Errorf("A garbage signature should be recognized as a strictly DER encoded ECDSA signature")
+	}
+	if emptyPushDataSig.GetSigHash() != 0x00 {
+		t.Errorf("The SigHash of the garbage signature should be invalid (0x00)")
 	}
 }
 
