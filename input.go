@@ -59,7 +59,7 @@ type Input struct {
 	Outpoint  Outpoint
 	ScriptSig BitcoinScript
 	Sequence  uint32
-	Witness   []BitcoinScript
+	Witness   ParsedBitcoinScript
 	inputType InputType
 }
 
@@ -68,8 +68,16 @@ func (in *Input) FromWireTxIn(txIn *wire.TxIn) {
 	in.Sequence = txIn.Sequence
 	in.ScriptSig = txIn.SignatureScript
 	in.Outpoint.FromWireOutpoint(&txIn.PreviousOutPoint)
-	for _, witness := range txIn.Witness {
-		in.Witness = append(in.Witness, witness)
+	for _, witnessElement := range txIn.Witness {
+		elementLength := len(witnessElement)
+		// if the element is empty then add a OP_0 opcode
+		if elementLength == 0 {
+			in.Witness = append(in.Witness, ParsedOpCode{OpCode: Op0})
+		} else {
+			opcode := GetDataPushOpCodeForLength(elementLength)
+			parsedOpCode := ParsedOpCode{OpCode: opcode, PushedData: witnessElement}
+			in.Witness = append(in.Witness, parsedOpCode)
+		}
 	}
 	in.inputType = in.GetType()
 }
@@ -168,23 +176,32 @@ func (in *Input) SpendsP2WSH() bool {
 	return false
 }
 
-// SpendsP2WPKH checks if an input spends a P2WPKH input.
+// SpendsP2WPKH checks if an input is spending a P2WPKH input.
 // A P2WPKH input has a empty scriptSig, but contains exactly two items in the witness:
 // [signature, pubkey]
 func (in *Input) SpendsP2WPKH() bool {
-	if in.HasWitness() && len(in.ScriptSig) == 0 {
-		if len(in.Witness) == 2 {
-			if len(in.Witness[0]) >= int(OpDATA1) && len(in.Witness[0]) <= int(OpDATA75) {
-				signature := ParsedOpCode{OpCode: OpCode(len(in.Witness[0])), PushedData: in.Witness[0]}
-				// SegWit was activated after BIP66 which required strict DER signatures
-				if signature.IsECDSASignature(true) && len(in.Witness[1]) >= int(OpDATA1) && len(in.Witness[0]) <= int(OpDATA75) {
-					pubKey := ParsedOpCode{OpCode: OpCode(len(in.Witness[1])), PushedData: in.Witness[1]}
-					return pubKey.IsPubKey()
-				}
-			}
-		}
+	// FIXME: rename to SpendsP2WPKH_V0 when Schnorr and Taproot
+	if !in.HasWitness() {
+		return false
 	}
-	return false
+	if len(in.ScriptSig) != 0 {
+		return false
+	}
+	if len(in.Witness) != 2 {
+		return false
+	}
+
+	firstWitnessElement := in.Witness[0]
+	if !firstWitnessElement.IsECDSASignature(true /* SegWit was activated after BIP66 which required strict DER signatures */) {
+		return false
+	}
+
+	secondWitnessElement := in.Witness[1]
+	if !secondWitnessElement.IsPubKey() {
+		return false
+	}
+
+	return true
 }
 
 // SpendsP2MS checks if an input spends a P2MS input.
@@ -324,7 +341,7 @@ func (in *Input) GetP2SHRedeemScript() (redeemScript BitcoinScript) {
 func (in *Input) GetP2WSHRedeemScript() (redeemScript BitcoinScript) {
 	if in.SpendsP2WSH() {
 		if in.HasWitness() && len(in.Witness) >= 1 {
-			return in.Witness[len(in.Witness)-1]
+			return in.Witness[len(in.Witness)-1].PushedData
 		}
 	}
 	return
@@ -335,7 +352,7 @@ func (in *Input) GetP2WSHRedeemScript() (redeemScript BitcoinScript) {
 func (in *Input) GetNestedP2WSHRedeemScript() (redeemScript BitcoinScript) {
 	if in.SpendsNestedP2WSH() {
 		if in.HasWitness() && len(in.Witness) >= 1 {
-			return in.Witness[len(in.Witness)-1]
+			return in.Witness[len(in.Witness)-1].PushedData
 		}
 	}
 	return

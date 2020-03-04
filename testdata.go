@@ -446,20 +446,5 @@ func GetTestTransactions() []TestTransaction {
 		},
 	}
 
-	/*
-		{
-			Note:        "",
-			RawTx:       "",
-			Size:        1111,
-			VSize:       999,
-			MultisigType:  []TestMultisigType{},
-			InputTypes:  []InputType{},
-			OutputTypes: []OutputType{},
-			Locktime:    888,
-			OutputSum:   777,
-			IsSpendingSegWit: xxx,
-		},
-	*/
-
 	return testTxns
 }

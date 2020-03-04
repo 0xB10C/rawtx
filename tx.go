@@ -12,7 +12,8 @@ import (
 
 // Tx represents a bitcoin transaction as a struct.
 type Tx struct {
-	Hash                  string
+	Hash                  []byte
+	HashString            string
 	Version               int32
 	Inputs                []Input
 	Outputs               []Output
@@ -29,7 +30,9 @@ func (tx *Tx) FromWireMsgTx(wireTx *wire.MsgTx) {
 	tx.serializeSize = wireTx.SerializeSize()
 	tx.serializeSizeStripped = wireTx.SerializeSizeStripped()
 	tx.bip69sorted = txsort.IsSorted(wireTx)
-	tx.Hash = wireTx.TxHash().String()
+	hash := wireTx.TxHash()
+	tx.Hash = hash.CloneBytes()
+	tx.HashString = hash.String()
 
 	for _, wireInput := range wireTx.TxIn {
 		in := Input{}
