@@ -12,6 +12,7 @@ import (
 type BitcoinScript []byte
 
 // ParsedOpCode respresents a OP Code as a part of a parsed BitcoinScript.
+// TODO: rename ito ParsedBitcoinScriptElement or something similar?
 type ParsedOpCode struct {
 	OpCode     OpCode
 	PushedData []byte
@@ -29,6 +30,28 @@ func (poc *ParsedOpCode) String() string {
 	}
 
 	return OpCodeStringMap[poc.OpCode]
+}
+
+// GetDataPushOpCodeForLength returns the optimal DataPush OpCode for the given data length
+// OpINVALIDOPCODE is returned for zero, negative or bigger than 0xffffffff inputs.
+func GetDataPushOpCodeForLength(length int) OpCode {
+	if length < 1 {
+		return OpINVALIDOPCODE
+	}
+
+	if length >= 1 && length <= 75 {
+		return OpCode(length)
+	}
+
+	if length > 75 && length <= 0xff {
+		return OpPUSHDATA1
+	} else if length > 0xff && length <= 0xffff {
+		return OpPUSHDATA2
+	} else if length > 0xffff && length <= 0xffffffff {
+		return OpPUSHDATA4
+	}
+
+	return OpINVALIDOPCODE
 }
 
 // ParsedBitcoinScript is a parsed BitcoinScript

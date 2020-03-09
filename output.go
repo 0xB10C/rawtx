@@ -74,13 +74,24 @@ func (out *Output) GetType() OutputType {
 // An OP_RETURN scriptPubKey looks like:
 //  OP_RETURN <SomeDataPush> <OP_RETURN data>
 func (out *Output) IsOPReturnOutput() (is bool) {
-	if len(out.ScriptPubKey) > 0 {
-		pbs := out.ScriptPubKey.Parse()
-		if pbs[0].OpCode == OpRETURN {
-			return true
-		}
+	if len(out.ScriptPubKey) <= 0 {
+		return false
 	}
-	return false
+	pbs := out.ScriptPubKey.Parse()
+
+	if len(pbs) < 2 {
+		return false
+	}
+
+	if pbs[0].OpCode != OpRETURN {
+		return false
+	}
+
+	if !pbs[1].OpCode.IsDataPushOpCode() {
+		return false
+	}
+
+	return true
 }
 
 // GetOPReturnData returns a ParsedOpCode struct,
@@ -88,11 +99,25 @@ func (out *Output) IsOPReturnOutput() (is bool) {
 // An OP_RETURN scriptPubKey looks like:
 //  OP_RETURN <SomeDataPush> <OP_RETURN data>
 func (out *Output) GetOPReturnData() (bool, ParsedOpCode) {
-	if out.IsOPReturnOutput() {
-		pbs := out.ScriptPubKey.Parse()
-		return true, pbs[1]
+	if !out.IsOPReturnOutput() {
+		return false, ParsedOpCode{}
 	}
-	return false, ParsedOpCode{}
+
+	pbs := out.ScriptPubKey.Parse()
+
+	// pbs[0] should be OP_RETURN
+	// pbs[1] should be data push
+	if len(pbs) < 2 {
+		return false, ParsedOpCode{}
+	}
+	if pbs[0].OpCode != OpRETURN {
+		return false, ParsedOpCode{}
+	}
+	if !pbs[1].OpCode.IsDataPushOpCode() {
+		return false, ParsedOpCode{}
+	}
+
+	return true, pbs[1]
 }
 
 // IsP2PKHOutput returns a boolean indicating if a output is a P2PKH output
