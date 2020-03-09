@@ -125,29 +125,52 @@ func (s BitcoinScript) getDataPushLength() (dataPushLength int, encodingLength i
 	return 0, 0
 }
 
-// IsSignature checks a ParsedOpCode if it could represent a DER encoded
-// signature.
-//  <sig length> <|signature|> <sig hash>
-// A signature looks like:
-//  <DER marker> <Sig length> <R marker> <R length> <|R value|> <S marker> <S length> <|S value|> <sig hash>
-func (poc ParsedOpCode) IsSignature() bool {
-	const derMarker = 0x30
-	const derValueMarker = 0x02
-	signature := poc.PushedData
-	if poc.OpCode >= OpDATA1 && poc.OpCode <= OpDATA75 { // OPCode is between OP_DATA_1 and OP_DATA_75
-		if len(signature) > 6 && // is at least seven bytes
-			signature[0] == derMarker && // starts with DER signature marker
-			signature[2] == derValueMarker { // and the third byte is a valid R value marker
-			signatureLength := int(signature[1])
-			rLength := int(signature[3])
-			if signatureLength > rLength && len(signature) == signatureLength+1+1+1 { // + 1 for DER marker, +1 for signature length, +1 for the SigHash flag
-				sMarker := signature[rLength+4]
-				if sMarker == derValueMarker {
-					return true
-				}
-			}
-		}
+// IsECDSASignature checks a ParsedOpCode if it could represent a ECDSA signature.
+func (poc *ParsedOpCode) IsECDSASignature(requireStrictDER bool) bool {
+	if len(poc.PushedData) < 1 {
+		return false
 	}
+
+	if poc.OpCode <= OpDATA7 || poc.OpCode >= OpDATA75 {
+		return false
+	}
+
+	sigBytes := poc.PushedData[:len(poc.PushedData)-1]
+	_, ok := DeserializeECDSASignature(sigBytes, requireStrictDER)
+
+	return ok
+}
+
+// IsECDSASignatureInStrictDER checks a ParsedOpCode if it represents a DER-encoded
+// signature.
+func (poc *ParsedOpCode) IsECDSASignatureInStrictDER() bool {
+	if len(poc.PushedData) < 1 {
+		return false
+	}
+
+	if poc.OpCode <= OpDATA7 || poc.OpCode >= OpDATA75 {
+		return false
+	}
+
+	sigBytes := poc.PushedData[:len(poc.PushedData)-1]
+	_, ok := DeserializeECDSASignature(sigBytes, true)
+
+	return ok
+}
+
+// IsSignature checks a ParsedOpCode if it could represent a signature.
+func (poc *ParsedOpCode) IsSignature() bool {
+	if len(poc.PushedData) < 1 {
+		return false
+	}
+
+	// All Sigs valid under IsECDSASignature are valid under IsECDSASignatureInStrictDER as well
+	if poc.IsECDSASignature(false) {
+		return true
+	}
+
+	// TODO: Add Schnorr signatures here
+
 	return false
 }
 

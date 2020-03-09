@@ -176,7 +176,8 @@ func (in *Input) SpendsP2WPKH() bool {
 		if len(in.Witness) == 2 {
 			if len(in.Witness[0]) >= int(OpDATA1) && len(in.Witness[0]) <= int(OpDATA75) {
 				signature := ParsedOpCode{OpCode: OpCode(len(in.Witness[0])), PushedData: in.Witness[0]}
-				if signature.IsSignature() && len(in.Witness[1]) >= int(OpDATA1) && len(in.Witness[0]) <= int(OpDATA75) {
+				// SegWit was activated after BIP66 which required strict DER signatures
+				if signature.IsECDSASignature(true) && len(in.Witness[1]) >= int(OpDATA1) && len(in.Witness[0]) <= int(OpDATA75) {
 					pubKey := ParsedOpCode{OpCode: OpCode(len(in.Witness[1])), PushedData: in.Witness[1]}
 					return pubKey.IsPubKey()
 				}
@@ -195,15 +196,15 @@ func (in *Input) SpendsP2MS() bool {
 		if len(pbs) >= 2 && pbs[0].OpCode == Op0 {
 			switch len(pbs) - 1 {
 			case 1: // has one signature for a 1-of-(1/2/3) multisig
-				if pbs[1].IsSignature() {
+				if pbs[1].IsECDSASignature(false) {
 					return true
 				}
 			case 2: // has two signatures for a 2-of-(2/3) multisig
-				if pbs[1].IsSignature() && pbs[2].IsSignature() {
+				if pbs[1].IsECDSASignature(false) && pbs[2].IsECDSASignature(false) {
 					return true
 				}
 			case 3: // has three signatures for a 3-of-3 multisig
-				if pbs[1].IsSignature() && pbs[2].IsSignature() && pbs[3].IsSignature() {
+				if pbs[1].IsECDSASignature(false) && pbs[2].IsECDSASignature(false) && pbs[3].IsECDSASignature(false) {
 					return true
 				}
 			default:
@@ -262,7 +263,7 @@ func (in *Input) SpendsNestedP2WSH() bool {
 func (in *Input) SpendsP2PKH() (spendsP2PKH bool) {
 	pbs := in.ScriptSig.Parse()
 	if !in.HasWitness() && len(pbs) == 2 {
-		return pbs[0].IsSignature() && pbs[1].IsPubKey()
+		return pbs[0].IsECDSASignature(false) && pbs[1].IsPubKey()
 	}
 	return false
 }
@@ -274,7 +275,7 @@ func (in *Input) SpendsP2PKHWithIsCompressed() (spendsP2PKH bool, isCompressedPu
 	pbs := in.ScriptSig.Parse()
 	if !in.HasWitness() && len(pbs) == 2 {
 		isPubKey, isCompressedPubKey := pbs[1].IsPubKeyWithIsCompressed()
-		return pbs[0].IsSignature() && isPubKey, isCompressedPubKey
+		return pbs[0].IsECDSASignature(false) && isPubKey, isCompressedPubKey
 	}
 	return false, false
 }
@@ -285,7 +286,7 @@ func (in *Input) SpendsP2PKHWithIsCompressed() (spendsP2PKH bool, isCompressedPu
 func (in *Input) SpendsP2PK() bool {
 	pbs := in.ScriptSig.Parse()
 	if !in.HasWitness() && len(pbs) == 1 {
-		return pbs[0].IsSignature()
+		return pbs[0].IsECDSASignature(false)
 	}
 	return false
 }
@@ -301,7 +302,7 @@ func (in *Input) SpendsP2SH() (spendsP2SH bool) {
 	pbs := in.ScriptSig.Parse()
 	if !in.HasWitness() && len(pbs) > 0 {
 		redeemScript := pbs[len(pbs)-1]
-		return !redeemScript.IsSignature() && !redeemScript.IsPubKey() // is not a signature and is not a pubkey
+		return !redeemScript.IsECDSASignature(false) && !redeemScript.IsPubKey() // is not a signature and is not a pubkey
 	}
 	return false
 }
