@@ -69,7 +69,7 @@ type LocktimeStats struct {
 func (tx *Tx) LocktimeStats() *LocktimeStats {
 	locktimeStats := &LocktimeStats{}
 	locktimeStats.Locktime = tx.Locktime
-	locktimeStats.IsBlockHeight = (tx.Locktime < 500000000)
+	locktimeStats.IsBlockHeight = (tx.Locktime > 0 && tx.Locktime < 500000000)
 	locktimeStats.IsTimestamp = (tx.Locktime >= 500000000)
 	for _, input := range tx.Inputs {
 		if input.Sequence < 0xffffffff {
