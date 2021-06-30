@@ -15,6 +15,7 @@ const (
 	OutP2MS
 	OutP2SH
 	OutP2WSH
+	OutP2TR
 	OutOPRETURN
 	OutUNKNOWN
 )
@@ -26,6 +27,7 @@ var outputTypeStringMap = map[OutputType]string{
 	OutP2MS:     "P2MS",
 	OutP2SH:     "P2SH",
 	OutP2WSH:    "P2WSH",
+	OutP2TR:     "P2TR",
 	OutOPRETURN: "OPRETURN",
 	OutUNKNOWN:  "UNKNOWN",
 }
@@ -60,6 +62,8 @@ func (out *Output) GetType() OutputType {
 		return OutP2WPKH
 	} else if out.IsP2WSHV0Output() {
 		return OutP2WSH
+	} else if out.IsP2TROutput() {
+		return OutP2TR
 	} else if out.IsOPReturnOutput() {
 		return OutOPRETURN
 	} else if is, _, _ := out.IsP2MSOutput(); is {
@@ -174,7 +178,7 @@ func (out *Output) IsP2WSHV0Output() bool {
 	pbs := out.ScriptPubKey.Parse()
 	if len(pbs) == 2 {
 		if pbs[0].OpCode == Op0 && // witness program 0
-			pbs[1].OpCode == OpDATA32 { // OP_DATA_32 // FIXME: could also be inefficient with OpPUSHDATA1 / 2 / 4  ?
+			pbs[1].OpCode == OpDATA32 { // OP_DATA_32
 			return true
 		}
 	}
@@ -195,6 +199,20 @@ func (out *Output) IsP2PKOutput() bool {
 	pbs := out.ScriptPubKey.Parse()
 	if len(pbs) == 2 {
 		if pbs[0].IsPubKey() && pbs[1].OpCode == OpCHECKSIG {
+			return true
+		}
+	}
+	return false
+}
+
+// IsP2TROutput returns a boolean indicating if a output is a P2TR output
+// A P2TR output looks like:
+//	OP_1 OP_PUSH32 <schnorr_public_key>
+func (out *Output) IsP2TROutput() bool {
+	pbs := out.ScriptPubKey.Parse()
+	if len(pbs) == 2 {
+		if pbs[0].OpCode == Op1 && // witness program 1
+			pbs[1].OpCode == OpDATA32 { // OP_DATA_32 pushing the schnorr public key
 			return true
 		}
 	}

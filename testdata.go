@@ -444,6 +444,22 @@ func GetTestTransactions() []TestTransaction {
 			IsBIP69Compliant:         true,
 			IsSpendingMultisig:       false,
 		},
+		{
+			// P2TR on SigNet
+			Note:                     "6a8cb2d81062ef93ae5d58b5cbe78d5fc5159f609e0d06f767d2f8eae5ead907",
+			RawTx:                    "020000000001015842125794eae23dc1910d513fab7a81d26aeb196da15eda986adc26aee3d0060100000000feffffff02301b0f00000000002251203d3e6d002d642acf8653bcf26b81dbe656df5bf88b6d54221b2606bc78f3d4e6492600000000000016001406c303262759a5bf810ffbdde3721c622ff2cd30024730440220136315309acc3a2f73f3ab1e8859a6c2e2c91271079322418b1d3d82eb00834b022043f4ef434d47157a4f5c74fa65a882cc13b29f81e4a4ff101d97854728b3e41001210341d84fbc50dddcccb3ee51abd12eca8c06ed79d764432c82f70ba6ff4b11bd56b7680000",
+			Size:                     234,
+			VSize:                    153,
+			CompressedPubKey:         []bool{false},
+			MultisigType:             []TestMultisigType{noMultisig},
+			InputTypes:               []InputType{InP2WPKH}, //v0_p2wpkh
+			OutputTypes:              []OutputType{OutP2TR, OutP2WPKH},
+			Locktime:                 26807,
+			OutputSum:                999801,
+			IsExplicitlySignalingRBF: false,
+			IsBIP69Compliant:         false,
+			IsSpendingMultisig:       false,
+		},
 	}
 
 	return testTxns
