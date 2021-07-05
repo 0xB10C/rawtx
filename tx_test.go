@@ -133,7 +133,7 @@ func TestIsSpendingSegWit(t *testing.T) {
 		result := tx.IsSpendingSegWit()
 		expected := false
 		for _, inputType := range testTx.InputTypes {
-			if inputType == InP2SH_P2WPKH || inputType == InP2SH_P2WSH || inputType == InP2WPKH || inputType == InP2WSH || inputType == InCOINBASE_WITNESS {
+			if inputType == InP2SH_P2WPKH || inputType == InP2SH_P2WSH || inputType == InP2WPKH || inputType == InP2WSH || inputType == InCOINBASE_WITNESS || inputType == InP2TRKP || inputType == InP2TRSP {
 				expected = true
 				break
 			}
@@ -190,7 +190,7 @@ func TestIsSpendingNativeSegWit(t *testing.T) {
 		result := tx.IsSpendingNativeSegWit()
 		expected := false
 		for _, inputType := range testTx.InputTypes {
-			if inputType == InP2WPKH || inputType == InP2WSH {
+			if inputType == InP2WPKH || inputType == InP2WSH || inputType == InP2TRKP || inputType == InP2TRSP {
 				expected = true
 				break
 			}

@@ -19,6 +19,8 @@ const (
 	InP2SH
 	InP2SH_P2WSH
 	InP2WSH
+	InP2TRKP // key path
+	InP2TRSP // script path
 	InCOINBASE
 	InCOINBASE_WITNESS
 	InUNKNOWN
@@ -33,10 +35,16 @@ var inputTypeStringMap = map[InputType]string{
 	InP2SH:             "P2SH",
 	InP2SH_P2WSH:       "P2SH_P2WSH",
 	InP2WSH:            "P2WSH",
+	InP2TRKP:           "P2TR KeyPath",
+	InP2TRSP:           "P2TR ScriptPath",
 	InCOINBASE:         "COINBASE",
 	InCOINBASE_WITNESS: "COINBASE_WITNESS",
 	InUNKNOWN:          "UNKNOWN",
 }
+
+const TAPROOT_ANNEX_INDICATOR = 0x50
+const TAPROOT_LEAF_TAPSCRIPT = 0xc0
+const TAPROOT_LEAF_MASK = 0xfe
 
 func (it InputType) String() string {
 	return inputTypeStringMap[it]
@@ -103,6 +111,10 @@ func (in *Input) GetType() InputType {
 		return InP2WPKH
 	} else if in.SpendsNestedP2WSH() {
 		return InP2SH_P2WSH
+	} else if in.SpendsP2TRKeyPath() {
+		return InP2TRKP
+	} else if in.SpendsP2TRScriptPath() {
+		return InP2TRSP
 	} else if in.SpendsP2WSH() {
 		return InP2WSH
 	} else if in.SpendsP2MS() {
@@ -123,7 +135,7 @@ func (in *Input) HasWitness() bool {
 func (in *Input) SpendsNativeSegWit() bool {
 	pbs := in.ScriptSig.Parse()
 	if len(pbs) == 0 && in.HasWitness() {
-		return in.SpendsP2WPKH() || in.SpendsP2WSH()
+		return in.SpendsP2WPKH() || in.SpendsP2TR() || in.SpendsP2WSH()
 	}
 	return false
 }
@@ -166,12 +178,10 @@ func (in *Input) IsCoinbase() bool {
 }
 
 // SpendsP2WSH checks if an input spends a P2WSH input.
-// Since all native SegWit inputs that aren't P2WPKH are probably
-// P2WSH this function just returns the complement for all native SegWit
-// transactions.
+// Native SegWit inputs that aren't P2WPKH or P2TR are likely P2WSH.
 func (in *Input) SpendsP2WSH() bool {
 	if in.HasWitness() && len(in.ScriptSig) == 0 {
-		return !in.SpendsP2WPKH()
+		return !(in.SpendsP2WPKH() || in.SpendsP2TR())
 	}
 	return false
 }
@@ -202,6 +212,57 @@ func (in *Input) SpendsP2WPKH() bool {
 	}
 
 	return true
+}
+
+func (in *Input) SpendsP2TR() bool {
+	return in.SpendsP2TRKeyPath() || in.SpendsP2TRScriptPath()
+}
+
+func (in *Input) SpendsP2TRScriptPath() bool {
+	if len(in.ScriptSig) != 0 || !in.HasWitness() {
+		return false
+	}
+
+	last_witness_element_index := len(in.Witness) - 1
+	control_block_index := last_witness_element_index
+
+	// check for annex
+	if in.Witness[last_witness_element_index].OpCode == TAPROOT_ANNEX_INDICATOR {
+		control_block_index = last_witness_element_index - 1
+	}
+
+	control_block := in.Witness[control_block_index]
+	if len(control_block.PushedData) < 1+32 || (len(control_block.PushedData)-1)%32 != 0 {
+		return false
+	}
+
+	if control_block.PushedData[0]&TAPROOT_LEAF_MASK == TAPROOT_LEAF_TAPSCRIPT {
+		return true
+	}
+
+	return true
+}
+
+func (in *Input) SpendsP2TRKeyPath() bool {
+	if len(in.ScriptSig) != 0 {
+		return false
+	}
+
+	if len(in.Witness) == 1 {
+		// without annex
+		if in.Witness[0].IsSchnorrSignature() {
+			return true
+		}
+	} else if len(in.Witness) == 2 {
+		if len(in.Witness[1].PushedData) > 0 && in.Witness[1].PushedData[0] == TAPROOT_ANNEX_INDICATOR {
+			// with annex
+			if in.Witness[0].IsSchnorrSignature() {
+				return true
+			}
+		}
+	}
+
+	return false
 }
 
 // SpendsP2MS checks if an input spends a P2MS input.
