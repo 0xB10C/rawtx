@@ -198,7 +198,7 @@ func (out *Output) IsP2MSOutput() (is bool, m int, n int) {
 func (out *Output) IsP2PKOutput() bool {
 	pbs := out.ScriptPubKey.Parse()
 	if len(pbs) == 2 {
-		if pbs[0].IsPubKey() && pbs[1].OpCode == OpCHECKSIG {
+		if pbs[0].IsECDSAPubKey() && pbs[1].OpCode == OpCHECKSIG {
 			return true
 		}
 	}
