@@ -14,7 +14,7 @@ func TestInputSpendsNativeSegWit(t *testing.T) {
 
 		for index, in := range tx.Inputs {
 			result := in.SpendsNativeSegWit()
-			expected := testTx.InputTypes[index] == InP2WPKH || testTx.InputTypes[index] == InP2WSH
+			expected := testTx.InputTypes[index] == InP2WPKH || testTx.InputTypes[index] == InP2WSH || testTx.InputTypes[index] == InP2TRKP || testTx.InputTypes[index] == InP2TRSP
 			if result != expected {
 				t.Errorf("Expected SpendsNativeSegWit() to be %t at index %d, but got %t for testTx: %+v", expected, index, result, testTx)
 			}

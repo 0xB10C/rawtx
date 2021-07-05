@@ -164,6 +164,20 @@ func (poc *ParsedOpCode) IsECDSASignature(requireStrictDER bool) bool {
 	return ok
 }
 
+// IsSchnorrSignature checks a ParsedOpCode if it could represent a Schnorr signature.
+func (poc *ParsedOpCode) IsSchnorrSignature() bool {
+	if len(poc.PushedData) == 64 {
+		return true
+	} else if len(poc.PushedData) == 65 {
+		sighash := poc.PushedData[len(poc.PushedData)-1]
+		if sighash == 0x01 || sighash == 0x02 || sighash == 0x03 || sighash == 0x81 || sighash == 0x82 || sighash == 0x83 {
+			return true
+		}
+		return false
+	}
+	return false
+}
+
 // IsECDSASignatureInStrictDER checks a ParsedOpCode if it represents a DER-encoded
 // signature.
 func (poc *ParsedOpCode) IsECDSASignatureInStrictDER() bool {
