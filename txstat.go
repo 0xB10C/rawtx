@@ -127,7 +127,7 @@ func (input *Input) InputStats() *InputStats {
 			if opCode.IsSignature() {
 				ss := opCode.SignatureStats()
 				inputStats.SigStats = append(inputStats.SigStats, ss)
-			} else if opCode.IsPubKey() {
+			} else if opCode.IsECDSAPubKey() {
 				pks := opCode.PubKeyStats()
 				inputStats.PubKeyStats = append(inputStats.PubKeyStats, pks)
 			} else if opCode.OpCode.IsDataPushOpCode() {
@@ -136,7 +136,7 @@ func (input *Input) InputStats() *InputStats {
 					if inScriptOpcode.IsSignature() {
 						ss := inScriptOpcode.SignatureStats()
 						inputStats.SigStats = append(inputStats.SigStats, ss)
-					} else if inScriptOpcode.IsPubKey() {
+					} else if inScriptOpcode.IsECDSAPubKey() {
 						pks := inScriptOpcode.PubKeyStats()
 						inputStats.PubKeyStats = append(inputStats.PubKeyStats, pks)
 					}
@@ -151,7 +151,7 @@ func (input *Input) InputStats() *InputStats {
 			if witnessElement.IsSignature() {
 				ss := witnessElement.SignatureStats()
 				inputStats.SigStats = append(inputStats.SigStats, ss)
-			} else if witnessElement.IsPubKey() {
+			} else if witnessElement.IsECDSAPubKey() {
 				pks := witnessElement.PubKeyStats()
 				inputStats.PubKeyStats = append(inputStats.PubKeyStats, pks)
 			} else if witnessElement.OpCode.IsDataPushOpCode() {
@@ -160,7 +160,7 @@ func (input *Input) InputStats() *InputStats {
 					if witnessOpCode.IsSignature() {
 						ss := witnessOpCode.SignatureStats()
 						inputStats.SigStats = append(inputStats.SigStats, ss)
-					} else if witnessOpCode.IsPubKey() {
+					} else if witnessOpCode.IsECDSAPubKey() {
 						pks := witnessOpCode.PubKeyStats()
 						inputStats.PubKeyStats = append(inputStats.PubKeyStats, pks)
 					}
@@ -211,7 +211,7 @@ type PubKeyStats struct {
 // The caller must make sure that the *ParsedOpCode is a pubkey.
 func (sigOpCode *ParsedOpCode) PubKeyStats() *PubKeyStats {
 	pkStats := &PubKeyStats{}
-	pkStats.IsCompressed = sigOpCode.IsCompressedPubKey()
+	pkStats.IsCompressed = sigOpCode.IsCompressedECDSAPubKey()
 	return pkStats
 }
 
@@ -240,7 +240,7 @@ func (out *Output) OutputStats() *OutputStats {
 	outStats.OpCodes = make([]OpCode, 0)
 	parsedScriptPubKey := out.ScriptPubKey.Parse()
 	for _, opCode := range parsedScriptPubKey {
-		if opCode.IsPubKey() {
+		if opCode.IsECDSAPubKey() {
 			pks := opCode.PubKeyStats()
 			outStats.PubKeyStats = append(outStats.PubKeyStats, pks)
 		}

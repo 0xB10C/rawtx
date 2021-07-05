@@ -220,35 +220,35 @@ func (poc ParsedOpCode) GetSigHash() (sighash byte) {
 	return 0x00
 }
 
-// IsPubKeyWithIsCompressed checks a two byte slices if they could represent a pubkey and if that pubkey is compressed.
-func (poc ParsedOpCode) IsPubKeyWithIsCompressed() (isPubKey bool, isCompressed bool) {
-	compressed := poc.IsCompressedPubKey()
-	uncompressed := poc.IsUncompressedPubKey()
+// IsECDSAPubKeyWithIsCompressed checks a two byte slices if they could represent a pubkey and if that pubkey is compressed.
+func (poc ParsedOpCode) IsECDSAPubKeyWithIsCompressed() (isPubKey bool, isCompressed bool) {
+	compressed := poc.IsCompressedECDSAPubKey()
+	uncompressed := poc.IsUncompressedECDSAPubKey()
 	return (compressed || uncompressed), compressed
 }
 
-// IsPubKey checks a two byte slices if they could represent a public key.
-func (poc ParsedOpCode) IsPubKey() bool {
-	if poc.IsCompressedPubKey() { // check compressed pubKeys first because they are more common
+// IsECDSAPubKey checks a two byte slices if they could represent a public key.
+func (poc ParsedOpCode) IsECDSAPubKey() bool {
+	if poc.IsCompressedECDSAPubKey() { // check compressed pubKeys first because they are more common
 		return true
-	} else if poc.IsUncompressedPubKey() {
+	} else if poc.IsUncompressedECDSAPubKey() {
 		return true
 	}
 	return false
 }
 
-// IsCompressedPubKey checks a two byte slices if they could represent a
+// IsCompressedECDSAPubKey checks a two byte slices if they could represent a
 // compressed public key. <pubkey length> <|pubkey|>
-func (poc ParsedOpCode) IsCompressedPubKey() bool {
+func (poc ParsedOpCode) IsCompressedECDSAPubKey() bool {
 	if poc.OpCode == OpDATA33 && len(poc.PushedData) == 33 {
 		return (poc.PushedData[0] == 0x02 || poc.PushedData[0] == 0x03)
 	}
 	return false
 }
 
-// IsUncompressedPubKey checks a two byte slices if they could represent a
+// IsUncompressedECDSAPubKey checks a two byte slices if they could represent a
 // uncompressed public key. <pubkey length> <|pubkey|>
-func (poc ParsedOpCode) IsUncompressedPubKey() bool {
+func (poc ParsedOpCode) IsUncompressedECDSAPubKey() bool {
 	if poc.OpCode == OpDATA65 && len(poc.PushedData) == 65 {
 		return poc.PushedData[0] == 0x04
 	}
@@ -275,7 +275,7 @@ func (s BitcoinScript) IsMultisigScript() (isMultisig bool, numRequiredSigs int,
 
 			// check that the next `numPossiblePubKeys` are pubKeys
 			for i := 1; i < numPossiblePubKeys; i++ {
-				if !parsed[pLength-2-i].IsPubKey() {
+				if !parsed[pLength-2-i].IsECDSAPubKey() {
 					return false, 0, 0
 				}
 			}

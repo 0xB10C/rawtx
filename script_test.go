@@ -109,11 +109,11 @@ func TestIsMultisigScript(t *testing.T) {
 func TestStrictlyDEREncodedECDSASig(t *testing.T) {
 	ECDSASigStrictlyDER := ParsedOpCode{OpCode: OpDATA71, PushedData: []byte{0x30, 0x44, 0x02, 0x20, 0x3c, 0x02, 0xbd, 0x6f, 0x63, 0xe4, 0x79, 0xc7, 0xc6, 0xd1, 0xdc, 0x7d, 0x94, 0x3b, 0x58, 0x4b, 0xa2, 0x03, 0xc6, 0xf1, 0x50, 0x37, 0x9c, 0x78, 0x9f, 0x84, 0xf8, 0xa5, 0xf3, 0x3c, 0x95, 0x12, 0x02, 0x20, 0x1c, 0xcf, 0x01, 0xbb, 0xeb, 0x2c, 0x5f, 0x68, 0xb1, 0x78, 0xab, 0x96, 0xa1, 0xa5, 0x64, 0xaf, 0x66, 0x09, 0xf7, 0x33, 0x87, 0xb9, 0x35, 0x5a, 0x62, 0x65, 0x54, 0x48, 0xb6, 0xa2, 0x7a, 0x43, 0x01}}
 
-	if ECDSASigStrictlyDER.IsCompressedPubKey() {
+	if ECDSASigStrictlyDER.IsCompressedECDSAPubKey() {
 		t.Errorf("A DER encoded signature should not be recognized as compressed pubkey")
 	}
 
-	if ECDSASigStrictlyDER.IsUncompressedPubKey() {
+	if ECDSASigStrictlyDER.IsUncompressedECDSAPubKey() {
 		t.Errorf("A DER encoded signature should not be recognized as uncompressed pubkey")
 	}
 
@@ -139,10 +139,10 @@ func TestGarbageSignature(t *testing.T) {
 	tooSmallOpCodeSig := ParsedOpCode{OpCode: OpDATA6, PushedData: []byte{0x10}}
 	emptyPushDataSig := ParsedOpCode{OpCode: OpDATA33, PushedData: []byte{}}
 
-	if tooBigOpCodeSig.IsCompressedPubKey() {
+	if tooBigOpCodeSig.IsCompressedECDSAPubKey() {
 		t.Errorf("A garbage signature should not be recognized as compressed pubkey")
 	}
-	if tooBigOpCodeSig.IsUncompressedPubKey() {
+	if tooBigOpCodeSig.IsUncompressedECDSAPubKey() {
 		t.Errorf("A garbage signature should not be recognized as uncompressed pubkey")
 	}
 	if tooBigOpCodeSig.IsSignature() {
@@ -158,10 +158,10 @@ func TestGarbageSignature(t *testing.T) {
 		t.Errorf("The SigHash of the garbage signature should be invalid (0x00)")
 	}
 
-	if tooSmallOpCodeSig.IsCompressedPubKey() {
+	if tooSmallOpCodeSig.IsCompressedECDSAPubKey() {
 		t.Errorf("A garbage signature should not be recognized as compressed pubkey")
 	}
-	if tooSmallOpCodeSig.IsUncompressedPubKey() {
+	if tooSmallOpCodeSig.IsUncompressedECDSAPubKey() {
 		t.Errorf("A garbage signature should not be recognized as uncompressed pubkey")
 	}
 	if tooSmallOpCodeSig.IsSignature() {
@@ -177,10 +177,10 @@ func TestGarbageSignature(t *testing.T) {
 		t.Errorf("The SigHash of the garbage signature should be invalid (0x00)")
 	}
 
-	if emptyPushDataSig.IsCompressedPubKey() {
+	if emptyPushDataSig.IsCompressedECDSAPubKey() {
 		t.Errorf("A garbage signature should not be recognized as compressed pubkey")
 	}
-	if emptyPushDataSig.IsUncompressedPubKey() {
+	if emptyPushDataSig.IsUncompressedECDSAPubKey() {
 		t.Errorf("A garbage signature should not be recognized as uncompressed pubkey")
 	}
 	if emptyPushDataSig.IsSignature() {

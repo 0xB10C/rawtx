@@ -207,7 +207,7 @@ func (in *Input) SpendsP2WPKH() bool {
 	}
 
 	secondWitnessElement := in.Witness[1]
-	if !secondWitnessElement.IsPubKey() {
+	if !secondWitnessElement.IsECDSAPubKey() {
 		return false
 	}
 
@@ -341,7 +341,7 @@ func (in *Input) SpendsNestedP2WSH() bool {
 func (in *Input) SpendsP2PKH() (spendsP2PKH bool) {
 	pbs := in.ScriptSig.Parse()
 	if !in.HasWitness() && len(pbs) == 2 {
-		return pbs[0].IsECDSASignature(false) && pbs[1].IsPubKey()
+		return pbs[0].IsECDSASignature(false) && pbs[1].IsECDSAPubKey()
 	}
 	return false
 }
@@ -352,7 +352,7 @@ func (in *Input) SpendsP2PKH() (spendsP2PKH bool) {
 func (in *Input) SpendsP2PKHWithIsCompressed() (spendsP2PKH bool, isCompressedPubKey bool) {
 	pbs := in.ScriptSig.Parse()
 	if !in.HasWitness() && len(pbs) == 2 {
-		isPubKey, isCompressedPubKey := pbs[1].IsPubKeyWithIsCompressed()
+		isPubKey, isCompressedPubKey := pbs[1].IsECDSAPubKeyWithIsCompressed()
 		return pbs[0].IsECDSASignature(false) && isPubKey, isCompressedPubKey
 	}
 	return false, false
@@ -380,7 +380,7 @@ func (in *Input) SpendsP2SH() (spendsP2SH bool) {
 	pbs := in.ScriptSig.Parse()
 	if !in.HasWitness() && len(pbs) > 0 {
 		redeemScript := pbs[len(pbs)-1]
-		return !redeemScript.IsECDSASignature(false) && !redeemScript.IsPubKey() // is not a signature and is not a pubkey
+		return !redeemScript.IsECDSASignature(false) && !redeemScript.IsECDSAPubKey() // is not a signature and is not a pubkey
 	}
 	return false
 }
@@ -461,8 +461,8 @@ func (in *Input) IsLNUniliteralClosing() bool {
 	redeemScript := in.GetP2WSHRedeemScript()
 	pbs := redeemScript.Parse()
 	if len(pbs) == 9 {
-		if pbs[0].OpCode == OpIF && pbs[1].IsPubKey() &&
-			pbs[2].OpCode == OpELSE && pbs[4].OpCode == OpCHECKSEQUENCEVERIFY && pbs[5].OpCode == OpDROP && pbs[6].IsPubKey() &&
+		if pbs[0].OpCode == OpIF && pbs[1].IsECDSAPubKey() &&
+			pbs[2].OpCode == OpELSE && pbs[4].OpCode == OpCHECKSEQUENCEVERIFY && pbs[5].OpCode == OpDROP && pbs[6].IsECDSAPubKey() &&
 			pbs[7].OpCode == OpENDIF &&
 			pbs[8].OpCode == OpCHECKSIG {
 			return true
