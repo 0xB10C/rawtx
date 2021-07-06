@@ -240,7 +240,7 @@ func (in *Input) SpendsP2TRScriptPath() bool {
 		return true
 	}
 
-	return true
+	return false
 }
 
 func (in *Input) SpendsP2TRKeyPath() bool {

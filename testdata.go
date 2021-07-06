@@ -505,6 +505,21 @@ func GetTestTransactions() []TestTransaction {
 			IsBIP69Compliant:         true,
 			IsSpendingMultisig:       false,
 		},
+		{
+			Note:                     "P2WSH input which was incorrectly classified as P2TRSP: bf4433072594dd7c790a4e68f48532222badb1b5b125408a9a156faae10ddce1",
+			RawTx:                    "010000000001012f822d6283a14a963c70c56483b99e19216fdbf70a3afac146b14d3f43a997d80000000000feffffff01b487f300000000001600145ccdb45c09f0f28c5a3881c9709d57ae6f8cea0c05483045022100df6f58c7edd35c07a6402b90a22111f2042506b62e4c7d1f7a6f70c5e59e8cd802201a932ea44900a1dfc632f3c1ca1fa0eeb4e7e609eec6914208245a607d7c8db5012103a244420b3e83975a8ac4214b451673064d188fac1dc5475bff650eb2088d2ad22093380cd01862f6633420e693d4e971a27fa0f7595b55abb447adc74b5ca98a250101616382012088a82010572ab1e1434523d11c25ad918ea586ed9bb6fe0006cec299e8b143797ff5d38876a914d791c6d8c7dfe3d85ebf1261ecb24479184fc81967046a91df60b17576a9143f6f16c4bc3cffdd0559c071421ac5608ef9fa3a6888ac00000000",
+			Size:                     325,
+			VSize:                    143,
+			CompressedPubKey:         []bool{false},
+			MultisigType:             []TestMultisigType{noMultisig},
+			InputTypes:               []InputType{InP2WSH},
+			OutputTypes:              []OutputType{OutP2WPKH},
+			Locktime:                 0,
+			OutputSum:                15959988,
+			IsExplicitlySignalingRBF: false,
+			IsBIP69Compliant:         true,
+			IsSpendingMultisig:       false,
+		},
 	}
 
 	return testTxns
