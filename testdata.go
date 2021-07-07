@@ -520,6 +520,21 @@ func GetTestTransactions() []TestTransaction {
 			IsBIP69Compliant:         true,
 			IsSpendingMultisig:       false,
 		},
+		{
+			Note:                     "@n1ckler's tx with 3 taproot outputs https://twitter.com/n1ckler/status/1334240709814136833: 9f3d438ab92e86bd86c64749416df8d3a48bcef97b7c32ccefc2ec4f02caac74",
+			RawTx:                    "020000000001029dac93ef467e6035bf641f4076b2a8ac6a4368e93d6c7dc8dcfb38b9bed7da840100000000feffffffbe415b1058e5294f30ccc12332d00636aa8874448141a0446737a1ffc7e6f5060100000000feffffff0410270000000000002251207a61c588fd357d8ed58f624fa7f97a651d1ac00b53b055e9b852507dd319a3d41027000000000000225120acd385f4c428f2ce97644de474a579a77435f40b6161d1c1875f48f2626fccde1e0e1e00000000001600147f611a8cfa64617c05c1b44341b4e469631371c3102700000000000022512070271d98a521d0e4102ebdbc40f3e553666fb5b85c8c3d2709138568c6c90b230247304402202945170a29517bf8773f6a741e587d87b3f4ec6e7348fae8443d45bc5a30f82402200207fcdb3369e55060725bdc2343236271e2dddb62a3077577a85e6f79d22404012103f682085f03c8a27288258933370b4cef8badb4c8a0e8bbfa31d78a450dffd543024730440220711d103aaed2122a8ddef8fd5523ccc7e3748382804dddccdf46e4755c2d1e9f022060e0564f3bf307d5c2128a4bcfd521c33a2bf1c3590cfc0d4fa7c8e02af26ab4012103f682085f03c8a27288258933370b4cef8badb4c8a0e8bbfa31d78a450dffd54300000000",
+			Size:                     468,
+			VSize:                    306,
+			CompressedPubKey:         []bool{false},
+			MultisigType:             []TestMultisigType{noMultisig, noMultisig, noMultisig, noMultisig},
+			InputTypes:               []InputType{InP2WPKH, InP2WPKH},
+			OutputTypes:              []OutputType{OutP2TR, OutP2TR, OutP2WPKH, OutP2TR},
+			Locktime:                 0,
+			OutputSum:                1999694,
+			IsExplicitlySignalingRBF: false,
+			IsBIP69Compliant:         false,
+			IsSpendingMultisig:       false,
+		},
 	}
 
 	return testTxns
