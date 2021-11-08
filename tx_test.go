@@ -145,6 +145,23 @@ func TestIsSpendingSegWit(t *testing.T) {
 	}
 }
 
+func TestIsSpendingTaproot(t *testing.T) {
+	testTxns := GetTestTransactions()
+	for _, testTx := range testTxns {
+		tx, err := StringToTx(testTx.RawTx)
+		if err != nil {
+			t.Error(err.Error())
+		}
+
+		result := tx.IsSpendingTaproot()
+		expected := testTx.IsSpendingTaproot
+
+		if result != expected {
+			t.Errorf("Expected IsSpendingTaproot() to be %t, but got %t for testTx: %+v", expected, result, testTx)
+		}
+	}
+}
+
 func TestIsExplicitlyRBFSignaling(t *testing.T) {
 	testTxns := GetTestTransactions()
 	for _, testTx := range testTxns {

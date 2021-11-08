@@ -35,6 +35,7 @@ type TestTransaction struct {
 	IsExplicitlySignalingRBF bool
 	IsBIP69Compliant         bool
 	IsSpendingMultisig       bool
+	IsSpendingTaproot        bool
 	IsLNUniliteralClosing    bool
 	P2MSType                 []TestMultisigType
 }
@@ -55,6 +56,7 @@ func GetTestTransactions() []TestTransaction {
 			IsExplicitlySignalingRBF: true,
 			IsBIP69Compliant:         false,
 			IsSpendingMultisig:       false,
+			IsSpendingTaproot:        false,
 		}, {
 			Note:                     "P2SH-P2WPKH test vector from BIP143 https://github.com/bitcoin/bips/blob/master/bip-0143.mediawiki#p2sh-p2wpkh",
 			RawTx:                    "01000000000101db6b1b20aa0fd7b23880be2ecbd4a98130974cf4748fb66092ac4d3ceb1a5477010000001716001479091972186c449eb1ded22b78e40d009bdf0089feffffff02b8b4eb0b000000001976a914a457b684d7f0d539a46a45bbc043f35b59d0d96388ac0008af2f000000001976a914fd270b1ee6abcaea97fea7ad0402e8bd8ad6d77c88ac02473044022047ac8e878352d3ebbde1c94ce3a10d057c24175747116f8288e5d794d12d482f0220217f36a485cae903c713331d877c1f64677e3622ad4010726870540656fe9dcb012103ad1d8e89212f0b92c74d23bb710c00662ad1470198ac48c43f7d6f93a2a2687392040000",
@@ -68,6 +70,7 @@ func GetTestTransactions() []TestTransaction {
 			IsExplicitlySignalingRBF: false,
 			IsBIP69Compliant:         true,
 			IsSpendingMultisig:       false,
+			IsSpendingTaproot:        false,
 		}, {
 			Note:                     "P2WSH test vector from BIP143 https://github.com/bitcoin/bips/blob/master/bip-0143.mediawiki#native-p2wsh",
 			RawTx:                    "01000000000102fe3dc9208094f3ffd12645477b3dc56f60ec4fa8e6f5d67c565d1c6b9216b36e000000004847304402200af4e47c9b9629dbecc21f73af989bdaa911f7e6f6c2e9394588a3aa68f81e9902204f3fcf6ade7e5abb1295b6774c8e0abd94ae62217367096bc02ee5e435b67da201ffffffff0815cf020f013ed6cf91d29f4202e8a58726b1ac6c79da47c23d1bee0a6925f80000000000ffffffff0100f2052a010000001976a914a30741f8145e5acadf23f751864167f32e0963f788ac000347304402200de66acf4527789bfda55fc5459e214fa6083f936b430a762c629656216805ac0220396f550692cd347171cbc1ef1f51e15282e837bb2b30860dc77c8f78bc8501e503473044022027dc95ad6b740fe5129e7e62a75dd00f291a2aeb1200b84b09d9e3789406b6c002201a9ecd315dd6a0e632ab20bbb98948bc0c6fb204f2c286963bb48517a7058e27034721026dccc749adc2a9d0d89497ac511f760f45c47dc5ed9cf352a58ac706453880aeadab210255a9626aebf5e29c0e6538428ba0d1dcf6ca98ffdf086aa8ced5e0d0215ea465ac00000000",
@@ -82,6 +85,7 @@ func GetTestTransactions() []TestTransaction {
 			IsExplicitlySignalingRBF: false,
 			IsBIP69Compliant:         true,
 			IsSpendingMultisig:       false,
+			IsSpendingTaproot:        false,
 		}, {
 			Note:                     "2nd P2WSH test vector from BIP143  https://github.com/bitcoin/bips/blob/master/bip-0143.mediawiki#native-p2wsh",
 			RawTx:                    "01000000000102e9b542c5176808107ff1df906f46bb1f2583b16112b95ee5380665ba7fcfc0010000000000ffffffff80e68831516392fcd100d186b3c2c7b95c80b53c77e77c35ba03a66b429a2a1b0000000000ffffffff0280969800000000001976a914de4b231626ef508c9a74a8517e6783c0546d6b2888ac80969800000000001976a9146648a8cd4531e1ec47f35916de8e259237294d1e88ac02483045022100f6a10b8604e6dc910194b79ccfc93e1bc0ec7c03453caaa8987f7d6c3413566002206216229ede9b4d6ec2d325be245c5b508ff0339bf1794078e20bfe0babc7ffe683270063ab68210392972e2eb617b2388771abe27235fd5ac44af8e61693261550447a4c3e39da98ac024730440220032521802a76ad7bf74d0e2c218b72cf0cbc867066e2e53db905ba37f130397e02207709e2188ed7f08f4c952d9d13986da504502b8c3be59617e043552f506c46ff83275163ab68210392972e2eb617b2388771abe27235fd5ac44af8e61693261550447a4c3e39da98ac00000000",
@@ -95,6 +99,7 @@ func GetTestTransactions() []TestTransaction {
 			IsExplicitlySignalingRBF: false,
 			IsBIP69Compliant:         false,
 			IsSpendingMultisig:       false,
+			IsSpendingTaproot:        false,
 		}, {
 			Note:                     "P2SH-P2WSH test vector from BIP143 https://github.com/bitcoin/bips/blob/master/bip-0143.mediawiki#p2sh-p2wsh",
 			RawTx:                    "0100000000010136641869ca081e70f394c6948e8af409e18b619df2ed74aa106c1ca29787b96e0100000023220020a16b5755f7f6f96dbd65f5f0d6ab9418b89af4b1f14a1bb8a09062c35f0dcb54ffffffff0200e9a435000000001976a914389ffce9cd9ae88dcc0631e88a821ffdbe9bfe2688acc0832f05000000001976a9147480a33f950689af511e6e84c138dbbd3c3ee41588ac080047304402206ac44d672dac41f9b00e28f4df20c52eeb087207e8d758d76d92c6fab3b73e2b0220367750dbbe19290069cba53d096f44530e4f98acaa594810388cf7409a1870ce01473044022068c7946a43232757cbdf9176f009a928e1cd9a1a8c212f15c1e11ac9f2925d9002205b75f937ff2f9f3c1246e547e54f62e027f64eefa2695578cc6432cdabce271502473044022059ebf56d98010a932cf8ecfec54c48e6139ed6adb0728c09cbe1e4fa0915302e022007cd986c8fa870ff5d2b3a89139c9fe7e499259875357e20fcbb15571c76795403483045022100fbefd94bd0a488d50b79102b5dad4ab6ced30c4069f1eaa69a4b5a763414067e02203156c6a5c9cf88f91265f5a942e96213afae16d83321c8b31bb342142a14d16381483045022100a5263ea0553ba89221984bd7f0b13613db16e7a70c549a86de0cc0444141a407022005c360ef0ae5a5d4f9f2f87a56c1546cc8268cab08c73501d6b3be2e1e1a8a08824730440220525406a1482936d5a21888260dc165497a90a15669636d8edca6b9fe490d309c022032af0c646a34a44d1f4576bf6a4a74b67940f8faa84c7df9abe12a01a11e2b4783cf56210307b8ae49ac90a048e9b53357a2354b3334e9c8bee813ecb98e99a7e07e8c3ba32103b28f0c28bfab54554ae8c658ac5c3e0ce6e79ad336331f78c428dd43eea8449b21034b8113d703413d57761b8b9781957b8c0ac1dfe69f492580ca4195f50376ba4a21033400f6afecb833092a9a21cfdf1ed1376e58c5d1f47de74683123987e967a8f42103a6d48b1131e94ba04d9737d61acdaa1322008af9602b3b14862c07a1789aac162102d8b661b0b3302ee2f162b09e07a55ad5dfbe673a9f01d9f0c19617681024306b56ae00000000",
@@ -108,6 +113,7 @@ func GetTestTransactions() []TestTransaction {
 			IsExplicitlySignalingRBF: false,
 			IsBIP69Compliant:         false,
 			IsSpendingMultisig:       true,
+			IsSpendingTaproot:        false,
 		}, {
 			Note:                     "No findAndDelete test vector from BIP143 https://github.com/bitcoin/bips/blob/master/bip-0143.mediawiki#no-findanddelete",
 			RawTx:                    "0100000000010169c12106097dc2e0526493ef67f21269fe888ef05c7a3a5dacab38e1ac8387f14c1d000000ffffffff01010000000000000000034830450220487fb382c4974de3f7d834c1b617fe15860828c7f96454490edd6d891556dcc9022100baf95feb48f845d5bfc9882eb6aeefa1bc3790e39f59eaa46ff7f15ae626c53e012102a9781d66b61fb5a7ef00ac5ad5bc6ffc78be7b44a566e3c87870e1079368df4c4aad4830450220487fb382c4974de3f7d834c1b617fe15860828c7f96454490edd6d891556dcc9022100baf95feb48f845d5bfc9882eb6aeefa1bc3790e39f59eaa46ff7f15ae626c53e0100000000",
@@ -121,6 +127,7 @@ func GetTestTransactions() []TestTransaction {
 			IsExplicitlySignalingRBF: false,
 			IsBIP69Compliant:         true,
 			IsSpendingMultisig:       false,
+			IsSpendingTaproot:        false,
 		}, {
 			Note:                     "non-SegWit tx",
 			RawTx:                    "010000000153dc411869f3b96f3dc48b6ac52438e895d6641142e0d4f6383fabc20e49e761010000006a4730440220177a4f6729b41ee6a06c2e4826b12313d9703e6fd3ee6cca347b4418cfe3a17b0220177ed399130c11f1b37a97f6e7982fc654f70139de0361eddc5d1cbf88d0c6e001210258764172106289665db078db8c6c3510e17e93caa0522d3ffca30a75562699b1ffffffff01ca06fc000000000017a914169e3bb06b5f0355e5085a8a1a5e430a3f6b39258700000000",
@@ -135,6 +142,7 @@ func GetTestTransactions() []TestTransaction {
 			IsExplicitlySignalingRBF: false,
 			IsBIP69Compliant:         true,
 			IsSpendingMultisig:       false,
+			IsSpendingTaproot:        false,
 		}, {
 			Note:                     "Tx with a P2WPKH input and output",
 			RawTx:                    "010000000001018a6fa51ae43f2ceda41b87f031780efb08b805d5586ca168478f578b3db47f750100000000ffffffff02cef305000000000016001442994f8e95f4aeefe7026fd3ab82d61643f4b85c776f0200000000001976a914cb6a8d7cec6c85f7231fc3f0882f69106144544988ac02483045022100e67d877ec38a95225eb8a223e3ca2c2fec695d388e84d7e7a8a2e196c8558437022048e479db3995ad1da78135de9f21e0846e0f718e81305dbc09b95a024f6965150121037827646e5d609cd578840074176616bc351ef73415e07b216f65eb56856a218a00000000",
@@ -148,6 +156,7 @@ func GetTestTransactions() []TestTransaction {
 			IsExplicitlySignalingRBF: false,
 			IsBIP69Compliant:         false,
 			IsSpendingMultisig:       false,
+			IsSpendingTaproot:        false,
 		}, {
 			Note:                     "coinbase of block 593121 (00000000000000000012d93a116d77b07c13aaa38064c190a6b9d32564295d88)",
 			RawTx:                    "010000000001010000000000000000000000000000000000000000000000000000000000000000ffffffff6403e10c092cfabe6d6dac3f54c625e5b22571b68df1bd4c9392a096d20fca4710dcd09b3a1c032682f710000000f09f909f000d4d696e656420627920656d636400000000000000000000000000000000000000000000000000000000000005005682000000000000040142114b000000001976a914c825a1ecf2a6830c4401620c3a16f1995057c2ab88ac00000000000000002f6a24aa21a9ed81cb99269c66ef4c042cd75b0524197551c3d5e511fa9b351467797c3055495408000000000000000000000000000000002c6a4c2952534b424c4f434b3a78b8a956fe947a9f117cfbc1bb18bd396ad6d94fa700ad2088110d2d0019a12d0000000000000000266a24b9e11b6d418b1b8f1479dd3d191cdd579962c4f95c380559624c3352a2a7c4c6476ddeee012000000000000000000000000000000000000000000000000000000000000000001bc99339",
@@ -162,6 +171,7 @@ func GetTestTransactions() []TestTransaction {
 			IsExplicitlySignalingRBF: true,
 			IsBIP69Compliant:         false,
 			IsSpendingMultisig:       false,
+			IsSpendingTaproot:        false,
 		}, {
 			Note:                     "Bitfinex P2SH 7x 3-of-6 multisig",
 			RawTx:                    "0100000007ff18b29d121db838b15cbf98f1948d02412b7a1ce4202aeb0ca8e7c14c3710c100000000fdab010047304402207992fc8bbe49438cb80202b5d53f552d5724c8c2bf45d6471cb3754d27d72a18022046173a143c4a91aa783514ed2b73a13e3dab61168042da5d37556df741fb9931014830450221008891afc0bfc3bba234fccd3626ae58e21677d8536554f7355ca7ba82a2060519022063bbd6e022ab2d72797e6cc5856e647ce8f81b54d623695371223d5b2f64c07701473044022011c2ccc04fe0844b725c330f220c9d24073dcbf4c99f4401d0ea575dd195483f022077c421f170bb7b02a549416c96284683e9ebff70518ebb9b995a7198c6302078014ccf5321021ecd2e5eb5dbd7c8e59f66e37da2ae95f7d61a07f4b2567c3bb10bbb1b2ec95321023bd78b0e7606fc1205721e4403355dfc0dbe4f1b15712cbbb17b1dc323cc8c0b2102afa49972b95496b39e7adc13437239ded698d81c85e9d029debb88641733528d2102b63fe474a5daac88eb74fdc9ce0ec69a8f8b81d2d89ac8d518a2f54d4bcaf4a52102fb394aaf232e114c06b1d1ca15f97602d2377c33e6fe5a1287421b09b08a5a3e2103fedb540dd71a0211170b1857a3888d9f950231ecd0fcc7a37ffe094721ca151f56aeffffffffed42f31a7435fae5a78b366ea99139382f6c9b52921d21eb96bad006b5babb2d00000000fdab0100473044022030600d7a916147cbeb960e1bed81dadde4848300481e0d4306efdfb528e26d7402206049986b3d850f506d04148e0afdf2523e9769ee594357057d202d0e70d0ef7001483045022100f6bf7bc55e0b8edaf8fbc7179288b3e617c98139a89b7d99ff4c05d3080b1f10022064f71808342147b3da4e22746e5b1ea6cf46123bc70d712a0ff9ab06be717d3901473044022049eabc645e12d43979ab1dedd04ddd4c78feeafc042fb8315472502278d0367c02207f50f0515cab10b4dc06e995ea8e7a73931249c71615dac52b6691f89ce2ea8a014ccf5321021ecd2e5eb5dbd7c8e59f66e37da2ae95f7d61a07f4b2567c3bb10bbb1b2ec95321023bd78b0e7606fc1205721e4403355dfc0dbe4f1b15712cbbb17b1dc323cc8c0b2102afa49972b95496b39e7adc13437239ded698d81c85e9d029debb88641733528d2102b63fe474a5daac88eb74fdc9ce0ec69a8f8b81d2d89ac8d518a2f54d4bcaf4a52102fb394aaf232e114c06b1d1ca15f97602d2377c33e6fe5a1287421b09b08a5a3e2103fedb540dd71a0211170b1857a3888d9f950231ecd0fcc7a37ffe094721ca151f56aeffffffff3ab5fa3e85edab538e1438eb45346fafb4e0e8b0e11aaf6ec1a883bd03719d2a00000000fdac0100483045022100a3a348a2c7f76c37fd92e6cbd9e53d6857cefde1ebf93ad8db94a99f4fd9e89c02201a8c8d6654211b73fd01f26acd7c4625a74efc4dc3b75ce21224ade4b82249f001483045022100b375d6c543e8d699826545012e97a953013a8da0918ccad5280f730f64a24df80220101246a7de231d98549da1052dd189abcfb5c6a34eb3591f1a0a8717e282e51801473044022045facd6638f7e25e49bc74c75e193692fb91685f54c2ff1f8c568b3c803bba550220788b9f5a432acdcdf0a154f0402ba3f778f3d00b60058208e00aa8399e118615014ccf5321021ecd2e5eb5dbd7c8e59f66e37da2ae95f7d61a07f4b2567c3bb10bbb1b2ec95321023bd78b0e7606fc1205721e4403355dfc0dbe4f1b15712cbbb17b1dc323cc8c0b2102afa49972b95496b39e7adc13437239ded698d81c85e9d029debb88641733528d2102b63fe474a5daac88eb74fdc9ce0ec69a8f8b81d2d89ac8d518a2f54d4bcaf4a52102fb394aaf232e114c06b1d1ca15f97602d2377c33e6fe5a1287421b09b08a5a3e2103fedb540dd71a0211170b1857a3888d9f950231ecd0fcc7a37ffe094721ca151f56aeffffffffd9529291a6addf3f1576ea380f00251669bea83a05c61e84cf933eea11d522e500000000fdaa01004730440220329a8a4adad1a86c3f0e92e927375c38f294762c655b105bdd5b874a910ed1d6022044e0f2d4ef8888cdb41755bac55ff57ecce84221ec07e7055c1e27838938fc3a0147304402205397fb16f9bce6db67d8dc28f5fb8a3c26a67b180da2bb20efe59716f268ced40220037b5d2ae767f5e88aebde62a54166a9baa9369f3315c432371711170a9d21190147304402205ebb3a34591b1376d8d1d178413348bf5d9c70759172344199efdf146d5e7b810220587efadba568c816129d334d48e17df465535efaf3aabd3fb43c4d39ca842c05014ccf5321021ecd2e5eb5dbd7c8e59f66e37da2ae95f7d61a07f4b2567c3bb10bbb1b2ec95321023bd78b0e7606fc1205721e4403355dfc0dbe4f1b15712cbbb17b1dc323cc8c0b2102afa49972b95496b39e7adc13437239ded698d81c85e9d029debb88641733528d2102b63fe474a5daac88eb74fdc9ce0ec69a8f8b81d2d89ac8d518a2f54d4bcaf4a52102fb394aaf232e114c06b1d1ca15f97602d2377c33e6fe5a1287421b09b08a5a3e2103fedb540dd71a0211170b1857a3888d9f950231ecd0fcc7a37ffe094721ca151f56aeffffffff0804a282a4694712252824f8c60571700b354a1948d3e71c7c0f7861aa24bd5c00000000fdac0100483045022100cd167a8dc556a409d69f1b4222e6288a046e13bd1a4f8be8fbdb7e7e8f12917c022034b813f601b911898b491900e74d7ae8456140c94404dc48ae8cc1b6bc56a62801483045022100e713c1ae8bfbe1be12846d796ead01548f9c4cc8c6f7970366a1f923f1eb8a0f02200ff4d76fea78ed570fb51f773a0dae148fe44801fcad98d31b70e81d65783e7e01473044022020d343486de33f9950696ea5cfa74e78c0346935aaf5c235235f1840a3c0999802204eb133646ac04c6be504681cb65656934b5305fe10bd0d3bce7876c1a9b1ad20014ccf5321021ecd2e5eb5dbd7c8e59f66e37da2ae95f7d61a07f4b2567c3bb10bbb1b2ec95321023bd78b0e7606fc1205721e4403355dfc0dbe4f1b15712cbbb17b1dc323cc8c0b2102afa49972b95496b39e7adc13437239ded698d81c85e9d029debb88641733528d2102b63fe474a5daac88eb74fdc9ce0ec69a8f8b81d2d89ac8d518a2f54d4bcaf4a52102fb394aaf232e114c06b1d1ca15f97602d2377c33e6fe5a1287421b09b08a5a3e2103fedb540dd71a0211170b1857a3888d9f950231ecd0fcc7a37ffe094721ca151f56aeffffffff55d4f31eb895915ec3ae3d9fd266b6e8f7b5e5bc47e5af23d31a7d6fade75d6400000000fdac010047304402206918234d3df76f3fb99560858528538d97f050a22a4782f2447c0934d18d9f3f02202b90f0d8c977e8cd5a1a759a5d017bf35c5c32703470cf215b0bc916fa1de77e01483045022100c39380d7df5cbb0f81546c58227ed6348037c21056b2ab1287f21e1ab25156280220380194488b30e7c6fdea7ab696313b81259769554cfd408a465bb8409dad853001483045022100faa84363ac94a486518b2d629cd30511bfb320508e309bce674b9258dab3773a022066e41a057b08277a2466cc0282bfa98ee1f293673a0ababc8b968385380dfb74014ccf5321021ecd2e5eb5dbd7c8e59f66e37da2ae95f7d61a07f4b2567c3bb10bbb1b2ec95321023bd78b0e7606fc1205721e4403355dfc0dbe4f1b15712cbbb17b1dc323cc8c0b2102afa49972b95496b39e7adc13437239ded698d81c85e9d029debb88641733528d2102b63fe474a5daac88eb74fdc9ce0ec69a8f8b81d2d89ac8d518a2f54d4bcaf4a52102fb394aaf232e114c06b1d1ca15f97602d2377c33e6fe5a1287421b09b08a5a3e2103fedb540dd71a0211170b1857a3888d9f950231ecd0fcc7a37ffe094721ca151f56aeffffffff6c417f303af4401183060d72726fe5c42d450709878d0f07452def783be9806200000000fdab010047304402201ce19d07ba6bd775ac787b63ac956101b2420e0a768007762a4f55de0cb492e00220320911d2cdc36c296b153f6bb6bb2ce38877898be48b1d8889dfbbffc2752ce50147304402202f6126395a81a99535e01a1b1764287f5f848cb2aabc7c864113c8393afe8cd902204d6540db22ea85278c72aeb2b80502a94d756a6d3236a66a8482f6e6794900b20148304502210084f4eba2280eea2a0b56ab8b0c510f75896a29fa6ad090751b34b6b9b4e0eeb102203f10182ae52a6d2d000da021e4e5772f9ae4a447dd7a2d3f6ba9d8a1ae314f44014ccf5321021ecd2e5eb5dbd7c8e59f66e37da2ae95f7d61a07f4b2567c3bb10bbb1b2ec95321023bd78b0e7606fc1205721e4403355dfc0dbe4f1b15712cbbb17b1dc323cc8c0b2102afa49972b95496b39e7adc13437239ded698d81c85e9d029debb88641733528d2102b63fe474a5daac88eb74fdc9ce0ec69a8f8b81d2d89ac8d518a2f54d4bcaf4a52102fb394aaf232e114c06b1d1ca15f97602d2377c33e6fe5a1287421b09b08a5a3e2103fedb540dd71a0211170b1857a3888d9f950231ecd0fcc7a37ffe094721ca151f56aeffffffff02c9c612070400000017a9147c6775e20e3e938d2d7e9d79ac310108ba501ddb8700d0ed902e0000001976a914cebb2851a9c7cfe2582c12ecaf7f3ff4383d1dc088ac00000000",
@@ -175,6 +185,7 @@ func GetTestTransactions() []TestTransaction {
 			IsExplicitlySignalingRBF: false,
 			IsBIP69Compliant:         false,
 			IsSpendingMultisig:       true,
+			IsSpendingTaproot:        false,
 		}, {
 			Note:                     "spends uncompressed pubkey",
 			RawTx:                    "0100000001f7d7667421677ae9bce69e558048e0aca48d704c1dc446cdec80c5e77df7c124000000008b483045022100b92b0d78a1a72b25179260e96a15efe95f98962622fb232f92d6c6ef20e15e9b022061c946c3f976339e370eabd256d91aa4711bb9985330f7d18ee77987b0ca24300141046c04c02f1138f440e8c5e9099db938bfba93d0389528bb7f6bf423ae203a2edcfba133f0409023d7ea13ac01c5aeedaf0bbfbeb8b82e9b48410d93a296da5b0cffffffff0100f2052a010000001976a914e6a874331cddf113e6f424f547aa93c10755d5e688ac00000000",
@@ -189,6 +200,7 @@ func GetTestTransactions() []TestTransaction {
 			IsExplicitlySignalingRBF: false,
 			IsBIP69Compliant:         true,
 			IsSpendingMultisig:       false,
+			IsSpendingTaproot:        false,
 			// uncompressed pubkey
 		}, {
 			Note:                     "has a P2MS output (1-of-1)",
@@ -204,6 +216,7 @@ func GetTestTransactions() []TestTransaction {
 			IsExplicitlySignalingRBF: false,
 			IsBIP69Compliant:         true,
 			IsSpendingMultisig:       false,
+			IsSpendingTaproot:        false,
 			P2MSType:                 []TestMultisigType{{true, 1, 1}, {false, 0, 0}, {false, 0, 0}},
 		}, {
 			Note:                     "has a P2MS output (2-of-3)",
@@ -219,6 +232,7 @@ func GetTestTransactions() []TestTransaction {
 			IsExplicitlySignalingRBF: false,
 			IsBIP69Compliant:         true,
 			IsSpendingMultisig:       false,
+			IsSpendingTaproot:        false,
 			P2MSType:                 []TestMultisigType{{true, 2, 3}},
 		}, {
 			Note:                     "has a P2MS output (3-of-3)",
@@ -234,6 +248,7 @@ func GetTestTransactions() []TestTransaction {
 			IsExplicitlySignalingRBF: false,
 			IsBIP69Compliant:         false,
 			IsSpendingMultisig:       false,
+			IsSpendingTaproot:        false,
 			P2MSType:                 []TestMultisigType{{true, 3, 3}, {false, 0, 0}, {false, 0, 0}},
 		}, {
 			Note:                     "has a P2MS input (1-of-X)",
@@ -248,6 +263,7 @@ func GetTestTransactions() []TestTransaction {
 			IsExplicitlySignalingRBF: false,
 			IsBIP69Compliant:         true,
 			IsSpendingMultisig:       true,
+			IsSpendingTaproot:        false,
 		}, {
 			Note:                     "has a P2MS input (2-of-X)",
 			RawTx:                    "010000000110a5fee9786a9d2d72c25525e52dd70cbd9035d5152fac83b62d3aa7e2301d58000000009300483045022100af204ef91b8dba5884df50f87219ccef22014c21dd05aa44470d4ed800b7f6e40220428fe058684db1bb2bfb6061bff67048592c574effc217f0d150daedcf36787601483045022100e8547aa2c2a2761a5a28806d3ae0d1bbf0aeff782f9081dfea67b86cacb321340220771a166929469c34959daf726a2ac0c253f9aff391e58a3c7cb46d8b7e0fdc4801ffffffff0180a21900000000001976a914971802edf585cdbc4e57017d6e5142515c1e502888ac00000000",
@@ -261,6 +277,7 @@ func GetTestTransactions() []TestTransaction {
 			IsExplicitlySignalingRBF: false,
 			IsBIP69Compliant:         true,
 			IsSpendingMultisig:       true,
+			IsSpendingTaproot:        false,
 		}, {
 			Note:                     "has a P2MS input (3-of-3)",
 			RawTx:                    "0100000001269ca5990a6bdd62b12dc7c03d05edbb98b94742c075c44686a911df75a7ae2d00000000d9004730440220c0949354ad3a8b7162360a3b513683c417b38ea237805580d75e14950f3a4fed02206f95bc753511e96d82592b01eea4ce0f05b76d24c19e6b707a6468f1f7943a18014730440220a5f9c09fb40a6b02a7d20fcd246ba72995f34613b5afe18bd1b8b197b756aea402200511aecc66f7d7738baca0515c18444ba024d30ef304cdcf375fa163d4217b34014730440220938b9fd2b543e544eeb09abe519a1dbe900ec2761eff7277d8fea2e8397b6687022002886dd0e36aeb18c0c8752303f6898776552f7f877ff1d900d9078b26314aba01ffffffff0180f0fa02000000001976a914641ad5051edd97029a003fe9efb29359fcee409d88ac00000000",
@@ -274,6 +291,7 @@ func GetTestTransactions() []TestTransaction {
 			IsExplicitlySignalingRBF: false,
 			IsBIP69Compliant:         true,
 			IsSpendingMultisig:       true,
+			IsSpendingTaproot:        false,
 		}, {
 			Note:                     "has a P2SH-P2WSH input (2-of-3)",
 			RawTx:                    "01000000000101708256c5896fb3f00ef37601f8e30c5b460dbcd1fca1cd7199f9b56fc4ecd5400000000023220020615ae01ed1bc1ffaad54da31d7805d0bb55b52dfd3941114330368c1bbf69b4cffffffff01603edb0300000000160014bbef244bcad13cffb68b5cef3017c7423675552204004730440220010d2854b86b90b7c33661ca25f9d9f15c24b88c5c4992630f77ff004b998fb802204106fc3ec8481fa98e07b7e78809ac91b6ccaf60bf4d3f729c5a75899bb664a501473044022046d66321c6766abcb1366a793f9bfd0e11e0b080354f18188588961ea76c5ad002207262381a0661d66f5c39825202524c45f29d500c6476176cd910b1691176858701695221026ccfb8061f235cc110697c0bfb3afb99d82c886672f6b9b5393b25a434c0cbf32103befa190c0c22e2f53720b1be9476dcf11917da4665c44c9c71c3a2d28a933c352102be46dc245f58085743b1cc37c82f0d63a960efa43b5336534275fc469b49f4ac53ae00000000",
@@ -287,6 +305,7 @@ func GetTestTransactions() []TestTransaction {
 			IsExplicitlySignalingRBF: false,
 			IsBIP69Compliant:         true,
 			IsSpendingMultisig:       true,
+			IsSpendingTaproot:        false,
 		}, {
 			Note:                     "LN Channel Close",
 			RawTx:                    "0200000000010170da497d146b89e24b8f84b1e85491dcbf4298be1265f391c421ff1e777962ea0000000000ffffffff018a030000000000001600141b7970d1c214cf071647c28b37aef7c4bc7848eb0400483045022100c74d2e5a17b0999d6c0b5b5a710b9a5ccfa2e1c8b04fbea93791c7336abcad9a0220431dc73960300d64c6222b73f3645c7ab798b0772f2f2d4a0c9b3d6b38f6da9b01473044022035dcfd5fbcc724096282845bf397e341cdf5c091ea12f0d8855de0259d72fccd02202209c763b75f1ec7be2de8efa71fbf19c012cef23c9ab24c380cd3ed516cfd4701475221023de58f2fa56342e90403400df0164e5e1cd0cb67c1fa0f2fea04dc96f237babb210324ad2fd5b24c5b9935f78805e66b0cf5cdcc746b8fbf08accf8c731778a96e5752ae00000000",
@@ -300,6 +319,7 @@ func GetTestTransactions() []TestTransaction {
 			IsExplicitlySignalingRBF: false,
 			IsBIP69Compliant:         true,
 			IsSpendingMultisig:       true,
+			IsSpendingTaproot:        false,
 		}, {
 			Note:                     "Unilateral LN channel close",
 			RawTx:                    "020000000001017480c7b96cfaad84d7de1bd117ed2ac7f97d10a3b452c8a001f51f58754e505e000000000090000000013804030000000000160014a708b82f3a139c78e3e7c7b6e1767ea016815ddb034730440220339a8427058d779a115bebc2657db4f132cc5537b93ff79074405ff0deb2571c022025210fb1f8f12d67a9027cbb0432547e9edd2e081938890ea8ab0d118c991a7601004d63210311271dfc0b80f9b16940f4c568b02f7cedd090a62cafd6b54a35701c79d4971167029000b27521023eeb6bd60f72a44bfebc0a341f7f280c6ee2469b0f49d9bfe96974bb63bba82e68ac00000000",
@@ -314,6 +334,7 @@ func GetTestTransactions() []TestTransaction {
 			IsBIP69Compliant:         true,
 			IsSpendingMultisig:       false,
 			IsLNUniliteralClosing:    true,
+			IsSpendingTaproot:        false,
 		}, {
 			Note:                     "Spends P2WSH multisig (2-of-3)",
 			RawTx:                    "0100000000010193a2db37b841b2a46f4e9bb63fe9c1012da3ab7fe30b9f9c974242778b5af8980000000000ffffffff01806fb307000000001976a914bbef244bcad13cffb68b5cef3017c7423675552288ac040047304402203cdcaf02a44e37e409646e8a506724e9e1394b890cb52429ea65bac4cc2403f1022024b934297bcd0c21f22cee0e48751c8b184cc3a0d704cae2684e14858550af7d01483045022100feb4e1530c13e72226dc912dcd257df90d81ae22dbddb5a3c2f6d86f81d47c8e022069889ddb76388fa7948aaa018b2480ac36132009bb9cfade82b651e88b4b137a01695221026ccfb8061f235cc110697c0bfb3afb99d82c886672f6b9b5393b25a434c0cbf32103befa190c0c22e2f53720b1be9476dcf11917da4665c44c9c71c3a2d28a933c352102be46dc245f58085743b1cc37c82f0d63a960efa43b5336534275fc469b49f4ac53ae00000000",
@@ -327,6 +348,7 @@ func GetTestTransactions() []TestTransaction {
 			IsExplicitlySignalingRBF: false,
 			IsBIP69Compliant:         true,
 			IsSpendingMultisig:       true,
+			IsSpendingTaproot:        false,
 		}, {
 			Note:                     "Satoshi to Hal in Block 170",
 			RawTx:                    "0100000001c997a5e56e104102fa209c6a852dd90660a20b2d9c352423edce25857fcd3704000000004847304402204e45e16932b8af514961a1d3a1a25fdf3f4f7732e9d624c6c61548ab5fb8cd410220181522ec8eca07de4860a4acdd12909d831cc56cbbac4622082221a8768d1d0901ffffffff0200ca9a3b00000000434104ae1a62fe09c5f51b13905f07f06b99a2f7159b2225f374cd378d71302fa28414e7aab37397f554a7df5f142c21c1b7303b8a0626f1baded5c72a704f7e6cd84cac00286bee0000000043410411db93e1dcdb8a016b49840f8c53bc1eb68a382e97b1482ecad7b148a6909a5cb2e0eaddfb84ccf9744464f82e160bfa9b8b64f9d4c03f999b8643f656b412a3ac00000000",
@@ -341,6 +363,7 @@ func GetTestTransactions() []TestTransaction {
 			IsExplicitlySignalingRBF: false,
 			IsBIP69Compliant:         true,
 			IsSpendingMultisig:       false,
+			IsSpendingTaproot:        false,
 		}, {
 			Note:                     "Coinbase from Block 500342 (Used to test a bug fix that a coinbase was not recognized correctly)",
 			RawTx:                    "01000000010000000000000000000000000000000000000000000000000000000000000000ffffffff5f0376a2071a2f5669614254432f4d696e6564206279206c7a6f7a313233342f2cfabe6d6da6d88f687bb14bcc0ebb42353875893e6e650aadd4f3c06645522a40c278ccb7010000000000000012d329f872eed68c722d5fafa8ed97dc000000ffffffff01807c814a000000001976a914536ffa992491508dca0354e52f32a3a7a679a53a88ac00000000",
@@ -354,6 +377,7 @@ func GetTestTransactions() []TestTransaction {
 			IsExplicitlySignalingRBF: false,
 			IsBIP69Compliant:         true,
 			IsSpendingMultisig:       false,
+			IsSpendingTaproot:        false,
 		}, {
 			Note:                     "OP_RETURN tx 1",
 			RawTx:                    "0100000001ae7458de7f7e2c42c7475c9a1ce5744e195e4147e11aaa4ec2d8d0ae7af8d4c4000000006a473044022058d4b1b6b3d033c1adbe1af3a7adcdba532564d4c1f6809b89d4c56077aa3185022040134d81667ecf1d620111c3c33365c0be3252094f4b8a82e711c13e95a2d0960121030651e1d15ae9a284ffd712885529d3344db3700be756e6c22c56a6c1b57d359dffffffff03f59e0900000000001976a914b64513c1f1b889a556463243cca9c26ee626b9a088ac22020000000000001976a9142d9e7c120da012b411704028132d9b8b70cf0cf188ac0000000000000000166a146f6d6e69000000000000001f0000002ce60be42000000000",
@@ -369,6 +393,7 @@ func GetTestTransactions() []TestTransaction {
 			IsExplicitlySignalingRBF: false,
 			IsBIP69Compliant:         false,
 			IsSpendingMultisig:       false,
+			IsSpendingTaproot:        false,
 		}, {
 			Note:                     "OP_RETURN tx 2",
 			RawTx:                    "0100000000010123ba2ddfc4629274b28b988728336909d765b54856a7f2f187a3008bc3b2efb9000000001716001402684fb6c5493259ea91eb57a7aa03050ba1833cfdffffff02563c39000000000017a914ed5a72a330f38a12289eddebbc2527d1b02adf8a870000000000000000226a20b2c168509b210a5ccae2879236aee2d7e203d6a8e9185a7075b6b7125a772e550248304502210095f8829904cb47d26c5e57d5fa2ec9a178d0c4463fb9ad27c5750974f18c4b8b02204d15cd3d515e29e53b9192d0cf369f1ab26aa97dee3d9792ba73bd954a351efb01210348fccf5befa3d149e9b9539905954afba6982abb24b1ec0b43aa31cc1255039534ef0800",
@@ -383,6 +408,7 @@ func GetTestTransactions() []TestTransaction {
 			IsExplicitlySignalingRBF: true,
 			IsBIP69Compliant:         false,
 			IsSpendingMultisig:       false,
+			IsSpendingTaproot:        false,
 		}, {
 			Note:                     "OP_RETURN tx 3",
 			RawTx:                    "01000000027f602387cefacdd0bf010ba5069e4768f6c5d25426636cec09f13fb75c18e808000000006a473044022067d9d2f27e4d92162370cb92c80908f5565078be3847e7e4d91e64c9df5882aa02205505f220d84035eb0c04559aa6ebd35bde6bb94e9cc863cd208552e86b10e276012103bef70edd2218d2c2ceca912d251c2a098e2210de065c0ddb609de4cf6eecd554ffffffffcdcef1800d78a1f8971a63d2e2084ba732e20e5b4cc4ad3e39ce1d3d82c8c857010000006b483045022100a505fd29b8cc5c8cd053e0b4cb4ce29f06c45cbadbb2383d42b9fceb0ada4a10022006ffa60058d461ec857be4cdfbe02e5712399eb8dfe623cc47f04ae28840d449012103bef70edd2218d2c2ceca912d251c2a098e2210de065c0ddb609de4cf6eecd554ffffffff03220200000000000017a91461e120f5feac1d5823fc7f789a342bb14f55e529870000000000000000166a146f6d6e69000000000000001f0000000d837bbf20c4912700000000001976a9149b7e08b89238d14df5f792ab890d3da8015f766388ac00000000",
@@ -398,6 +424,7 @@ func GetTestTransactions() []TestTransaction {
 			IsExplicitlySignalingRBF: false,
 			IsBIP69Compliant:         false,
 			IsSpendingMultisig:       false,
+			IsSpendingTaproot:        false,
 		}, {
 			Note:                     "OP_RETURN tx 4",
 			RawTx:                    "0100000002a81049fa255733ad050bdfb4fa5790b06ea64cf22d507a1a16edc3923ea4ec36010000006a4730440220536aa5227382741a165d86c92df72705dd431ae5c93a7510d8c3d2bd1b6a2bd902207dc06d21eef37a16853bf3c2200ee3ee60817f31505f2e3c188f35b1219249280121032147a3a9b68a5b366f5ee6f7d8c85b50d2421769740cc77da8e0affd99e2b0d3fffffffff6920616dff298be6c900d0121d626d6a3078404eda2166a1d1e95ab16afadf2000000006b483045022100cc3b8de53bceafa2ea1ed39163edb86b13f26f4bce606c95bd408a136d5be94b022043a0ec0b94e0220111d9bb77f42d7aa2fca916edff7a7a1ee1e9dfb6529c04b50121023a28578a1b0295c647085b0c7eab2cfcbe785f7ebfe6ed82c44cf9fdacf22cc2feffffff0398a03a00000000001976a9145122aba1d311f35e9a7f142e3c3ea14726de523188ac0000000000000000166a146f6d6e69000000000000001f000000057191b15022020000000000001976a91490f617c8925baee39a2a473dd9929e88a2fdbd2588ac00000000",
@@ -413,6 +440,7 @@ func GetTestTransactions() []TestTransaction {
 			IsExplicitlySignalingRBF: false,
 			IsBIP69Compliant:         false,
 			IsSpendingMultisig:       false,
+			IsSpendingTaproot:        false,
 		},
 		{
 			Note:                     "015ee1a8a7f1e2a4a0939b119f6d96e3db3fa759489c2fad6db50cb11428590d",
@@ -428,6 +456,7 @@ func GetTestTransactions() []TestTransaction {
 			IsExplicitlySignalingRBF: false,
 			IsBIP69Compliant:         false,
 			IsSpendingMultisig:       false,
+			IsSpendingTaproot:        false,
 		},
 		{
 			Note:                     "5d2bea10e0c490d9d2a22fd06afe0bbde9cb7992ce71795deb3ea55d7a744c60",
@@ -443,6 +472,7 @@ func GetTestTransactions() []TestTransaction {
 			IsExplicitlySignalingRBF: false,
 			IsBIP69Compliant:         true,
 			IsSpendingMultisig:       false,
+			IsSpendingTaproot:        false,
 		},
 		{
 			Note:                     "P2TR output on SigNet: 6a8cb2d81062ef93ae5d58b5cbe78d5fc5159f609e0d06f767d2f8eae5ead907",
@@ -458,6 +488,7 @@ func GetTestTransactions() []TestTransaction {
 			IsExplicitlySignalingRBF: false,
 			IsBIP69Compliant:         false,
 			IsSpendingMultisig:       false,
+			IsSpendingTaproot:        false,
 		},
 		{
 
@@ -474,6 +505,7 @@ func GetTestTransactions() []TestTransaction {
 			IsExplicitlySignalingRBF: false,
 			IsBIP69Compliant:         false,
 			IsSpendingMultisig:       false,
+			IsSpendingTaproot:        true,
 		},
 		{
 			Note:                     "P2TR script path spend on signet with 4 witness elements (no annex, 0xc1 leaf version): 692937bb7864cfcce9f7a5171d6af3646bf479204ffb9356a0d6ce8a4a7952f1",
@@ -489,6 +521,7 @@ func GetTestTransactions() []TestTransaction {
 			IsExplicitlySignalingRBF: false,
 			IsBIP69Compliant:         true,
 			IsSpendingMultisig:       false,
+			IsSpendingTaproot:        true,
 		},
 		{
 			Note:                     "P2TR script path spend on signet: 3117d2bb1c9962c9d4c7bc3d31f48a13878d346407323bbb316908f3ea6279ae",
@@ -504,6 +537,7 @@ func GetTestTransactions() []TestTransaction {
 			IsExplicitlySignalingRBF: false,
 			IsBIP69Compliant:         true,
 			IsSpendingMultisig:       false,
+			IsSpendingTaproot:        true,
 		},
 		{
 			Note:                     "P2WSH input which was incorrectly classified as P2TRSP: bf4433072594dd7c790a4e68f48532222badb1b5b125408a9a156faae10ddce1",
@@ -519,6 +553,7 @@ func GetTestTransactions() []TestTransaction {
 			IsExplicitlySignalingRBF: false,
 			IsBIP69Compliant:         true,
 			IsSpendingMultisig:       false,
+			IsSpendingTaproot:        false,
 		},
 		{
 			Note:                     "@n1ckler's tx with 3 taproot outputs https://twitter.com/n1ckler/status/1334240709814136833: 9f3d438ab92e86bd86c64749416df8d3a48bcef97b7c32ccefc2ec4f02caac74",
@@ -534,6 +569,7 @@ func GetTestTransactions() []TestTransaction {
 			IsExplicitlySignalingRBF: false,
 			IsBIP69Compliant:         false,
 			IsSpendingMultisig:       false,
+			IsSpendingTaproot:        false,
 		},
 	}
 

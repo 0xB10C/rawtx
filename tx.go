@@ -125,6 +125,16 @@ func (tx *Tx) IsSpendingMultisig() bool {
 	return false
 }
 
+// IsSpendingTaproot returns a boolean indicating if the transaction spends a taproot input
+func (tx *Tx) IsSpendingTaproot() bool {
+	for _, in := range tx.Inputs {
+		if in.SpendsP2TR() {
+			return true
+		}
+	}
+	return false
+}
+
 // IsCoinbase returns a boolean indicating if a the transaction is a coinbase
 // transaction.
 func (tx *Tx) IsCoinbase() bool {
