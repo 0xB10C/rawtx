@@ -11,6 +11,7 @@ type TxStats struct {
 	Size                     int
 	IsCoinbase               bool
 	IsSpendingSegWit         bool
+	IsSpendingTaproot        bool
 	IsSpendingNativeSegWit   bool
 	IsSpendingNestedSegWit   bool
 	IsBIP69Compliant         bool
@@ -32,6 +33,7 @@ func (tx *Tx) Stats() *TxStats {
 	txstats.IsSpendingNativeSegWit = tx.IsSpendingNativeSegWit()
 	txstats.IsSpendingNestedSegWit = tx.IsSpendingNestedSegWit()
 	txstats.IsSpendingSegWit = tx.IsSpendingSegWit()
+	txstats.IsSpendingTaproot = tx.IsSpendingTaproot()
 	txstats.IsBIP69Compliant = tx.IsBIP69Compliant()
 	txstats.IsExplicitlyRBFSignaling = tx.IsExplicitlyRBFSignaling()
 	txstats.Locktime = tx.LocktimeStats()
