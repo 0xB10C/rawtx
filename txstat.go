@@ -55,6 +55,10 @@ func (tx *Tx) Stats() *TxStats {
 	if len(txstats.OutStats) > 1 {
 		txstats.Payments--
 	}
+  // Also, don't count OP_RETURN outputs as payments.
+  if tx.HasOPReturnOutput() {
+		txstats.Payments--
+  }
 
 	return txstats
 }
