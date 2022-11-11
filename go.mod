@@ -1,8 +1,8 @@
 module github.com/0xb10c/rawtx
 
-go 1.12
+go 1.16
 
 require (
-	github.com/btcsuite/btcd v0.0.0-20190824003749-130ea5bddde3
-	github.com/btcsuite/btcutil v0.0.0-20190425235716-9e5f4b9a998d
+	github.com/btcsuite/btcd v0.23.2
+	github.com/btcsuite/btcd/btcutil v1.1.0
 )

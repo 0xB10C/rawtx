@@ -7,7 +7,7 @@ import (
 	"math"
 
 	"github.com/btcsuite/btcd/wire"
-	"github.com/btcsuite/btcutil/txsort"
+	"github.com/btcsuite/btcd/btcutil/txsort"
 )
 
 // Tx represents a bitcoin transaction as a struct.
